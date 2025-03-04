@@ -4,12 +4,11 @@ from threading import Thread
 
 from flask import Flask, request, send_file
 
-from .config import config
+from .config import config, ICON_PATH
 from .record import recorder
 from .screenshot import screenshot
 from .system_tray import show_notification, start_system_tray
 
-ICON_PATH = "peekapi.ico"
 
 app = Flask(__name__)
 

@@ -1,12 +1,29 @@
+import os
+import sys
 import tomllib
 
+def get_icon_path():
+    if getattr(sys, 'frozen', False):
+        return os.path.join(sys._MEIPASS, "peekapi.ico")
+    else:
+        return os.path.join(os.path.dirname(__file__), "peekapi.ico")
+
+def get_config_path():
+    if getattr(sys, 'frozen', False):
+        return os.path.join(os.path.dirname(sys.executable), "config.toml")
+    else:
+        return os.path.join(os.path.dirname(__file__), "config.toml")
+
 class Config:
-    CONFIG_FILE = "config.toml"
+    CONFIG_FILE = get_config_path()
 
     def __init__(self):
         """读取并解析 config.toml 配置"""
-        with open(self.CONFIG_FILE, "rb") as f:
-            cfg = tomllib.load(f)
+        if os.path.exists(self.CONFIG_FILE):
+            with open(self.CONFIG_FILE, "rb") as f:
+                cfg = tomllib.load(f)
+        else:
+            cfg = {}
 
         # 基础配置
         basic = cfg.get("basic", {})
@@ -26,3 +43,4 @@ class Config:
         self.gain = record.get("gain", 20.0)
 
 config = Config()
+ICON_PATH = get_icon_path()

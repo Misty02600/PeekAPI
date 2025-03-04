@@ -7,10 +7,9 @@ from PIL import Image, ImageDraw
 from pystray import MenuItem as Item
 from winotify import Notification
 
-from .config import config
+from .config import config, ICON_PATH
 from .record import recorder
 
-ICON_PATH = "peekapi.ico"
 
 def create_icon():
     """ 创建托盘图标，如果找不到就生成默认图标 """
