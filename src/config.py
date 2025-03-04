@@ -19,11 +19,12 @@ class Config:
 
     def __init__(self):
         """读取并解析 config.toml 配置"""
-        if os.path.exists(self.CONFIG_FILE):
-            with open(self.CONFIG_FILE, "rb") as f:
-                cfg = tomllib.load(f)
-        else:
-            cfg = {}
+        if not os.path.exists(self.CONFIG_FILE):
+            with open(self.CONFIG_FILE, "w", encoding="utf-8") as f:
+                f.write("")
+
+        with open(self.CONFIG_FILE, "rb") as f:
+            cfg = tomllib.load(f) if f.read() else {}
 
         # 基础配置
         basic = cfg.get("basic", {})
