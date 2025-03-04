@@ -1,9 +1,9 @@
 [project]
-name = "peek-api"
+name = "PeekAPI"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "Your Name",email = "you@example.com"}
+    {name = "Misty",email = "74812967+Misty02600@users.noreply.github.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.11"
