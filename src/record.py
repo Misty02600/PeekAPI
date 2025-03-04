@@ -25,7 +25,6 @@ class AudioRecorder:
         self.duration = duration
         self.gain = gain
 
-        # 计算环形缓冲区大小 (samples)
         self.buffer_size = int(self.rate * self.duration)
         self.buffer = collections.deque(maxlen=self.buffer_size)
 
