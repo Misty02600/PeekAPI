@@ -22,7 +22,7 @@ class Config:
 
         # 录音配置
         record = cfg.get("record", {})
-        self.duration = record.get("duration", 8)
+        self.duration = record.get("duration", 20)
         self.gain = record.get("gain", 20.0)
 
 config = Config()
