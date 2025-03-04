@@ -1,13 +1,13 @@
 [basic]
-is_public = true  # 默认是否公开
+is_public = true   # 默认是否公开
 api_key = "Imkei"  # 低模糊度下获取截图的key
-host = "0.0.0.0"  # 监听IP
-port = 1920  # 监听端口
+host = "0.0.0.0"   # 监听IP
+port = 1920        # 监听端口
 
 [screenshot]
-radius_threshold = 3  # 高斯模糊半径阈值，低于该值时需要api_key
+radius_threshold = 3      # 高斯模糊半径阈值，低于该值时需要api_key
 main_screen_only = false  # 多显示器下是否只截主显示器
 
 [record]
 duration = 20  # 录音时长（秒）
-gain = 20  # 音量增益
+gain = 20      # 音量增益
