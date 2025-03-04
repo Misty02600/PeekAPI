@@ -7,7 +7,7 @@ import wave
 import numpy as np
 import soundcard as sc
 
-from config import config
+from .config import config
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

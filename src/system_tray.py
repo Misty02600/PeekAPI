@@ -3,11 +3,12 @@ import sys
 import time
 
 import pystray
-from config import config
 from PIL import Image, ImageDraw
 from pystray import MenuItem as Item
-from record import recorder
 from winotify import Notification
+
+from .config import config
+from .record import recorder
 
 ICON_PATH = "peekapi.ico"
 
