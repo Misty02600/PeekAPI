@@ -8,7 +8,7 @@
 |------------|------------|--------------|-----------|--------------|--------------|
 | **`/screen`** | `GET` | 获取屏幕截图 | - `r`（截图半径，可选）<br>- `k`（API 密钥，可选） | - `200 OK`，返回 `image/jpeg` 截图 | - `401 Unauthorized`：低模糊度密钥错误<br>- `403 Forbidden`：私密模式<br>- `500 Internal Server Error`：截图失败 |
 | **`/record`** | `GET` | 获取最近录音 | 无 | - `200 OK`，返回 `audio/wav` 录音文件 | - `403 Forbidden`：私密模式<br>- `500 Internal Server Error`：录音失败 |
-| **`/check`** | `GET/POST` | 服务器健康检查 | 无 | - `200 OK` | 无 |
+| **`/check`** | `GET/POST` | 检查是否运行 | 无 | - `200 OK` | 无 |
 
 
 ## **配置**
