@@ -1,0 +1,13 @@
+[basic]
+is_public = true
+api_key = "Imkei"
+host = "0.0.0.0"
+port = 1920
+
+[screenshot]
+radius_threshold = 3
+main_screen_only = false
+
+[record]
+duration = 20
+gain = 20
