@@ -10,10 +10,13 @@
 | **`/record`** | `GET` | 获取最近录音 | 无 | - `200 OK`，返回 `audio/wav` 录音文件 | - `403 Forbidden`：私密模式<br>- `500 Internal Server Error`：录音失败 |
 | **`/check`** | `GET/POST` | 检查是否运行 | 无 | - `200 OK` | 无 |
 
-
 ## **使用**
 
-下载 release 的 PeekAPI.exe，在同级目录创建 `config.toml` 文件，加入以下配置后运行。
+- 下载 [release](https://github.com/Misty02600/PeekAPI/releases) 的 PeekAPI.exe，在同级目录创建 `config.toml` 文件，根据[配置](#配置)写入内容，运行程序。
+- 若电脑无公网且在远程电脑调用API，需要搭配 frp 使用。
+- 可以使用 `PeekAPI.exe --console` 运行以显示控制台输出。
+
+## **配置**
 
 **示例**
 
