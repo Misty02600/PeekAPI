@@ -66,13 +66,13 @@ if __name__ == '__main__':
     show_notification("Peek API已启动", "")
 
     try:
-        # 确保录音器启动
+        # 启动录音
         recorder.start_recording()
 
         # 启动系统托盘
         Thread(target=start_system_tray, daemon=True).start()
 
-        # 启动Flask或其它WSGI服务
+        # 启动Flask
         server = Thread(target=lambda: app.run(
             host=config.host,
             port=config.port,

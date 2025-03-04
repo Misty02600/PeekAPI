@@ -25,5 +25,4 @@ class Config:
         self.duration = record.get("duration", 8)
         self.gain = record.get("gain", 20.0)
 
-# 全局配置实例
 config = Config()
