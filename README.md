@@ -17,18 +17,18 @@ PeekAPI 通过 `config.toml` 进行配置：
 
 ```toml
 [basic]
-is_public = true
-api_key = "Imkei"
-host = "0.0.0.0"
-port = 1920
+is_public = true   # 程序启动时默认是否为公开模式
+api_key = "Imkei"  # 低模糊度下获取截图的key
+host = "0.0.0.0"   # 监听IP
+port = 1920        # 监听端口
 
 [screenshot]
-radius_threshold = 3
-main_screen_only = false
+radius_threshold = 3      # 高斯模糊半径阈值，低于该值时调用/screen需要api_key
+main_screen_only = false  # 多显示器下是否只截取主显示器
 
 [record]
-duration = 20
-gain = 20
+duration = 20  # 录音时长（秒）
+gain = 20      # 音量增益倍数
 ```
 
 **配置说明**
