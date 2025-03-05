@@ -1,18 +1,20 @@
 import os
 import sys
 import tomllib
+from pathlib import Path
 
 def get_icon_path():
     if getattr(sys, 'frozen', False):
-        return os.path.join(sys._MEIPASS, "peekapi.ico")
+        return Path(sys._MEIPASS) / "peekapi.ico"
     else:
-        return os.path.join(os.path.dirname(__file__), "peekapi.ico")
+        return Path() / "peekapi.ico"
 
 def get_config_path():
     if getattr(sys, 'frozen', False):
-        return os.path.join(os.path.dirname(sys.executable), "config.toml")
+        return Path(sys.executable) / "config.toml"
     else:
-        return os.path.join(os.path.dirname(__file__), "config.toml")
+        return Path() / "config.toml"
+
 
 class Config:
     CONFIG_FILE = get_config_path()
