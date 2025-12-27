@@ -1,27 +1,35 @@
 [project]
-name = "PeekAPI"
+name = "peekapi"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "Misty",email = "74812967+Misty02600@users.noreply.github.com"}
+    {name = "Misty", email = "74812967+Misty02600@users.noreply.github.com"}
 ]
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
 dependencies = [
-    "pillow (>=11.1.0,<12.0.0)",
-    "mss (>=10.0.0,<11.0.0)",
-    "flask (>=3.1.0,<4.0.0)",
-    "pystray (>=0.19.5,<0.20.0)",
-    "winotify (>=1.1.0,<2.0.0)",
-    "wave (>=0.0.2,<0.0.3)",
-    "soundcard (>=0.4.3,<0.5.0)",
+    "pillow>=11.1.0,<12.0.0",
+    "mss>=10.0.0,<11.0.0",
+    "flask>=3.1.0,<4.0.0",
+    "pystray>=0.19.5,<0.20.0",
+    "winotify>=1.1.0,<2.0.0",
+    "wave>=0.0.2,<0.0.3",
+    "soundcard>=0.4.3,<0.5.0",
+    "pydantic>=2.0.0,<3.0.0",
 ]
 
+[project.scripts]
+peekapi = "peekapi.cli:main"
+peekapi-console = "peekapi.cli:main_console"
+
+[dependency-groups]
+dev = [
+    "pyinstaller>=6.12.0",
+]
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.poetry.group.dev.dependencies]
-pyinstaller = "^6.12.0"
-
+[tool.hatch.build.targets.wheel]
+packages = ["src/peekapi"]
