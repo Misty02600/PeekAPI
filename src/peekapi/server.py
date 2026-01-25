@@ -1,10 +1,12 @@
 import io
-import logging
+import sys
 from threading import Thread
 
 from flask import Flask, request, send_file
 
-from .config import config, ICON_PATH
+from .config import config
+from .constants import ICON_PATH
+from .logging import logger, setup_logging
 from .record import recorder
 from .screenshot import screenshot
 from .system_tray import show_notification, start_system_tray
@@ -21,12 +23,13 @@ def parse_float(value, default=0):
 @app.route('/screen', methods=["GET"])
 def screen_route():
     r = parse_float(request.args.get("r"))
-    k = request.args.get("k")
-    if r < config.radius_threshold and k != config.api_key:
+    k = request.args.get("k", "")
+    # 如果配置了 api_key 且不匹配，则拒绝访问
+    if r < config.screenshot.radius_threshold and config.basic.api_key and k != config.basic.api_key:
         return "没有权限查看高清图", 401
 
-    if config.is_public:
-        img_data = screenshot(r, config.main_screen_only)
+    if config.basic.is_public:
+        img_data = screenshot(r, config.screenshot.main_screen_only)
         if not img_data:
             return "截图失败", 500
         return send_file(io.BytesIO(img_data), mimetype='image/jpeg')
@@ -35,7 +38,7 @@ def screen_route():
 @app.route('/record', methods=["GET"])
 def record_route():
     audio_data = recorder.get_audio()
-    if config.is_public:
+    if config.basic.is_public:
         if audio_data is None:
             return "录音获取失败", 500
         return send_file(audio_data, mimetype='audio/wav')
@@ -53,6 +56,10 @@ def favicon():
         return '', 204
 
 def start_app():
+    # 检查命令行参数
+    console = "--console" in sys.argv or "--debug" in sys.argv
+    setup_logging(console=console)
+
     show_notification("Peek API已启动", "")
     try:
         # 启动录音
@@ -63,14 +70,15 @@ def start_app():
 
         # 启动 Flask 服务器
         server = Thread(target=lambda: app.run(
-            host=config.host,
-            port=config.port,
+            host=config.basic.host,
+            port=config.basic.port,
             debug=False,
             use_reloader=False
         ), daemon=True)
         server.start()
         server.join()
     except Exception as e:
-        logging.error(f"服务器错误: {e}")
+        logger.error(f"服务器错误: {e}")
     finally:
         recorder.stop_recording()
+

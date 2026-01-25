@@ -18,12 +18,14 @@
 ## Pending
 
 - [TASK001] 支持 Linux 平台 - 替换 Windows 专用依赖，实现跨平台支持
+- [TASK004] 为项目编写单元测试 - pytest + pytest-cov
 
 ---
 
 ## Completed
 
-*记忆库初始化时无历史已完成任务记录*
+- [TASK002] 重构 Config 模块使用 msgspec - ✅ 2026-01-25 完成
+- [TASK003] 日志系统迁移到 loguru - ✅ 2026-01-25 完成
 
 ---
 
@@ -38,10 +40,10 @@
 | 状态 | 数量 |
 |------|------|
 | In Progress | 0 |
-| Pending | 1 |
-| Completed | 0 |
+| Pending | 2 |
+| Completed | 2 |
 | Abandoned | 0 |
-| **总计** | **1** |
+| **总计** | **4** |
 
 ---
 

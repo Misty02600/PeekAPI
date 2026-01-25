@@ -17,7 +17,8 @@
 | soundcard | ^0.4.3 | 音频录制（Loopback）|
 | wave | ^0.0.2 | WAV 文件生成 |
 | numpy | ^2.0.0 | 音频数据处理 |
-| pydantic | ^2.0.0 | 配置验证 |
+| msgspec | ^0.19.0 | 配置解析（TOML）和验证 |
+| loguru | ^0.7.0 | 日志系统 |
 
 ### 开发依赖
 
@@ -63,7 +64,9 @@ PeekAPI/
 ├── src/
 │   └── peekapi/
 │       ├── __init__.py
-│       ├── config.py    # 配置管理
+│       ├── constants.py # 路径常量
+│       ├── config.py    # 配置管理（msgspec Struct）
+│       ├── logging.py   # 日志配置（loguru）
 │       ├── record.py    # 音频录制
 │       ├── screenshot.py # 屏幕截图
 │       ├── server.py    # Flask 服务

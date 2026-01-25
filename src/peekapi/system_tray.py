@@ -1,13 +1,15 @@
 import os
 import sys
 import time
+import subprocess
 
 import pystray
 from PIL import Image, ImageDraw
 from pystray import MenuItem as Item
 from winotify import Notification
 
-from .config import config, ICON_PATH
+from .config import config
+from .constants import ICON_PATH, LOG_DIR
 from .record import recorder
 
 
@@ -27,19 +29,19 @@ def show_notification(title, message):
         app_id="ChieriBotPeekAPI",
         title=title,
         msg=message,
-        icon=ICON_PATH,
+        icon=str(ICON_PATH),
         duration="short"
     )
     toast.show()
 
 def set_public(icon, item):
-    if not config.is_public:
-        config.is_public = True
+    if not config.basic.is_public:
+        config.basic.is_public = True
         print("模式已切换", "当前模式：公开")
 
 def set_private(icon, item):
-    if config.is_public:
-        config.is_public = False
+    if config.basic.is_public:
+        config.basic.is_public = False
         print("模式已切换", "当前模式：私密")
 
 def restart_recording(icon, item):
@@ -48,6 +50,13 @@ def restart_recording(icon, item):
     recorder.start_recording()
     print("已重新启动录音")
     show_notification("重启录音", "录音线程已重新启动")
+
+def open_log_folder(icon, item):
+    """打开日志文件夹"""
+    if LOG_DIR.exists():
+        subprocess.run(['explorer', str(LOG_DIR)])
+    else:
+        show_notification("日志目录", "日志目录不存在")
 
 def exit_app(icon, item):
     """ 退出应用 """
@@ -64,10 +73,11 @@ def start_system_tray():
         icon=icon_image,
         menu=pystray.Menu(
             Item("模式切换", pystray.Menu(
-                Item("公开", set_public, checked=lambda item: config.is_public, radio=True),
-                Item("私密", set_private, checked=lambda item: not config.is_public, radio=True)
+                Item("公开", set_public, checked=lambda item: config.basic.is_public, radio=True),
+                Item("私密", set_private, checked=lambda item: not config.basic.is_public, radio=True)
             )),
             Item("重启录音", restart_recording),
+            Item("打开日志", open_log_folder),
             Item("退出", exit_app)
         )
     )

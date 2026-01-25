@@ -16,7 +16,7 @@
 | 音频录制 API | ✅ 完成 | 环形缓冲区、自动重连 |
 | 健康检查 API | ✅ 完成 | GET/POST 支持 |
 | 系统托盘 | ✅ 完成 | 模式切换、重启录音 |
-| 配置管理 | ✅ 完成 | TOML 格式、Pydantic 验证 |
+| 配置管理 | ✅ 完成 | TOML 格式、msgspec Struct 验证 |
 | 日志系统 | ✅ 完成 | 按日期分文件 |
 | exe 打包 | ✅ 完成 | PyInstaller |
 

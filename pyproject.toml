@@ -15,8 +15,9 @@ dependencies = [
     "winotify>=1.1.0,<2.0.0",
     "wave>=0.0.2,<0.0.3",
     "soundcard>=0.4.3,<0.5.0",
-    "pydantic>=2.0.0,<3.0.0",
     "numpy>=2.0.0,<3.0.0",
+    "msgspec>=0.20.0",
+    "loguru>=0.7.3",
 ]
 
 [project.scripts]
