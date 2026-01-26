@@ -13,9 +13,8 @@ dependencies = [
     "flask>=3.1.0,<4.0.0",
     "pystray>=0.19.5,<0.20.0",
     "winotify>=1.1.0,<2.0.0",
-    "wave>=0.0.2,<0.0.3",
-    "soundcard>=0.4.3,<0.5.0",
-    "numpy>=2.0.0,<3.0.0",
+    "soundcard>=0.4.5,<0.5.0",
+    "numpy>=2.0.0,<2.3.0",
     "msgspec>=0.20.0",
     "loguru>=0.7.3",
 ]
@@ -26,8 +25,30 @@ peekapi = "peekapi.server:start_app"
 [dependency-groups]
 dev = [
     "pyinstaller>=6.12.0",
+    "pytest>=9.0.2",
+    "pytest-cov>=7.0.0",
 ]
 
 [build-system]
 requires = ["uv_build>=0.9.18,<0.10.0"]
 build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+markers = [
+    "integration: 集成测试，需要真实硬件环境",
+]
+
+[tool.coverage.run]
+source = ["src/peekapi"]
+omit = ["*/__pycache__/*", "*/tests/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]

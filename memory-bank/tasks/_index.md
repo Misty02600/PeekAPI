@@ -18,7 +18,8 @@
 ## Pending
 
 - [TASK001] 支持 Linux 平台 - 替换 Windows 专用依赖，实现跨平台支持
-- [TASK004] 为项目编写单元测试 - pytest + pytest-cov
+- [TASK005] 优化打包流程 - 创建 spec 文件，优化 PyInstaller 配置
+- [TASK006] 采用 soundfile 库 - 调研并替换手动字节流保存为 soundfile 库
 
 ---
 
@@ -26,6 +27,7 @@
 
 - [TASK002] 重构 Config 模块使用 msgspec - ✅ 2026-01-25 完成
 - [TASK003] 日志系统迁移到 loguru - ✅ 2026-01-25 完成
+- [TASK004] 为项目编写单元测试 - ✅ 2026-01-25 完成（63 测试，75% 覆盖率）
 
 ---
 
@@ -40,10 +42,10 @@
 | 状态 | 数量 |
 |------|------|
 | In Progress | 0 |
-| Pending | 2 |
-| Completed | 2 |
+| Pending | 3 |
+| Completed | 3 |
 | Abandoned | 0 |
-| **总计** | **4** |
+| **总计** | **6** |
 
 ---
 
