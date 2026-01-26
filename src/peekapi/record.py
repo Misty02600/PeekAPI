@@ -67,7 +67,7 @@ class AudioRecorder:
             if default_speaker is None:
                 logger.error("未找到默认扬声器")
                 return None
-            logger.info(f"使用默认扬声器: {default_speaker.name}")
+            logger.debug(f"使用默认扬声器: {default_speaker.name}")
             mic = sc.get_microphone(include_loopback=True, id=str(default_speaker.id))
             return mic
         except Exception as e:

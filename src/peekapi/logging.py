@@ -23,7 +23,5 @@ def setup_logging() -> None:
         level="INFO",
     )
 
-    logger.info("PeekAPI 日志系统初始化完成")
-
 
 __all__ = ["logger", "setup_logging"]

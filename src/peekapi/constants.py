@@ -5,14 +5,14 @@ from pathlib import Path
 
 
 def _get_base_dir() -> Path:
-    """获取基础目录：打包后为 exe 目录，开发时为项目根目录"""
+    """获取基础目录：打包后为 exe 目录，开发时为运行目录"""
     if getattr(sys, "frozen", False):
         return Path(sys.executable).parent
-    return Path(__file__).parent.parent.parent
+    return Path.cwd()
 
 
 def _get_icon_path() -> Path:
-    """获取图标路径：打包后从 _MEIPASS，开发时从项目根目录"""
+    """获取图标路径：打包后从 _MEIPASS，开发时为运行目录"""
     if getattr(sys, "frozen", False):
         return Path(sys._MEIPASS) / "peekapi.ico"
     return _get_base_dir() / "peekapi.ico"

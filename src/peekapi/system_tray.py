@@ -1,15 +1,14 @@
 import os
-import sys
 import time
 import subprocess
 
 import pystray
 from PIL import Image, ImageDraw
 from pystray import MenuItem as Item
-from winotify import Notification
 
 from .config import config
-from .constants import APP_ID, ICON_PATH, LOG_DIR
+from .constants import ICON_PATH, LOG_DIR
+from .logging import logger
 from .record import recorder
 
 
@@ -18,51 +17,43 @@ def create_icon():
     if os.path.exists(ICON_PATH):
         return Image.open(ICON_PATH)
     else:
+        logger.warning(f"图标文件不存在: {ICON_PATH}，使用默认图标")
         image = Image.new('RGB', (64, 64), (255, 255, 255))
         draw = ImageDraw.Draw(image)
         draw.rectangle([16, 16, 48, 48], fill="black")
         return image
 
 
-def show_notification(title, message):
-    """显示 Windows 通知"""
-    toast = Notification(
-        app_id=APP_ID,
-        title=title,
-        msg=message,
-        icon=str(ICON_PATH) if os.path.exists(ICON_PATH) else "",
-        duration="short"
-    )
-    toast.show()
-
-def set_public(icon, item):
+def set_public(_icon, _item):
     if not config.basic.is_public:
         config.basic.is_public = True
-        print("模式已切换", "当前模式：公开")
+        logger.info("模式已切换: 公开")
 
-def set_private(icon, item):
+
+def set_private(_icon, _item):
     if config.basic.is_public:
         config.basic.is_public = False
-        print("模式已切换", "当前模式：私密")
+        logger.info("模式已切换: 私密")
 
-def restart_recording(icon, item):
+
+def restart_recording(_icon, _item):
     recorder.stop_recording()
     time.sleep(1)
     recorder.start_recording()
-    print("已重新启动录音")
-    show_notification("重启录音", "录音线程已重新启动")
+    logger.info("录音线程已重新启动")
 
-def open_log_folder(icon, item):
+
+def open_log_folder(_icon, _item):
     """打开日志文件夹"""
-    if LOG_DIR.exists():
-        subprocess.run(['explorer', str(LOG_DIR)])
-    else:
-        show_notification("日志目录", "日志目录不存在")
+    subprocess.run(['explorer', str(LOG_DIR)])
 
-def exit_app(icon, item):
-    """ 退出应用 """
+
+def exit_app(icon, _item):
+    """退出应用"""
+    logger.info("用户退出应用")
     icon.stop()
     os._exit(0)
+
 
 def start_system_tray():
     """ 启动托盘菜单 """
@@ -84,11 +75,7 @@ def start_system_tray():
     )
 
     def run_tray():
-        try:
-            icon.run()
-        except Exception as e:
-            print(f"托盘错误: {e}")
-            show_notification("系统托盘错误", "请手动重启应用")
-            sys.exit(1)
+        icon.run()
+
 
     run_tray()
