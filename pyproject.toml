@@ -3,14 +3,15 @@ name = "peekapi"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "Misty", email = "74812967+Misty02600@users.noreply.github.com"}
+    { name = "Misty", email = "74812967+Misty02600@users.noreply.github.com" },
 ]
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
 dependencies = [
     "pillow>=11.1.0,<12.0.0",
     "mss>=10.0.0,<11.0.0",
-    "flask>=3.1.0,<4.0.0",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.34.0",
     "pystray>=0.19.5,<0.20.0",
     "soundcard>=0.4.5,<0.5.0",
     "soundfile>=0.13.0",
@@ -27,6 +28,7 @@ dev = [
     "pyinstaller>=6.12.0",
     "pytest>=9.0.2",
     "pytest-cov>=7.0.0",
+    "httpx>=0.28.0",
 ]
 
 [build-system]
@@ -38,9 +40,7 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
 addopts = "-v --tb=short"
-markers = [
-    "integration: 集成测试，需要真实硬件环境",
-]
+markers = ["integration: 集成测试，需要真实硬件环境"]
 
 [tool.coverage.run]
 source = ["src/peekapi"]
