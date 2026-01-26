@@ -1,8 +1,8 @@
 # [TASK005] - 优化打包流程
 
-**Status:** Pending
+**Status:** Completed
 **Added:** 2026-01-25
-**Updated:** 2026-01-25
+**Updated:** 2026-01-26
 **Priority:** Medium
 
 ## Original Request
@@ -274,30 +274,12 @@ python -m nuitka --mode=onefile --lto=yes --output-dir=dist run.py
 
 **文件位置：** 项目根目录 `peekapi.spec`
 
-**具体内容：**
-```python
-# -*- mode: python ; coding: utf-8 -*-
-
-block_cipher = None
-
-a = Analysis(
-    ['run.py'],
-    pathex=[],
-    binaries=[],
-    datas=[
-        ('peekapi.ico', '.'),           # 托盘图标
-        ('config.toml', '.'),           # 默认配置文件
-    ],
-    hiddenimports=[
-        # msgspec 相关
-        'msgspec',
-        'msgspec.toml',
-
-        # soundcard 相关
-        'soundcard',
-        'soundcard.mediafoundation',
-
-        # numpy 核心（排除不需要的）
+**关键配置说明：**
+- `console=False` - 无控制台窗口，所有日志通过 loguru 写入文件
+- `datas` - 包含图标和默认配置
+- `hiddenimports` - 显式声明动态导入的模块
+- `excludes` - 排除不需要的大型模块减小体积
+- `upx=True` - 启用 UPX 压缩（可选）
         'numpy',
         'numpy.core',
 
@@ -444,27 +426,27 @@ uv run pyinstaller peekapi.spec
 
 ## Implementation Plan
 
-- [ ] 1.1 移除 pyproject.toml 中的 wave 依赖
-- [ ] 1.2 创建 `peekapi.spec` 打包配置文件
-- [ ] 1.3 创建 `version_info.txt` Windows 版本信息
-- [ ] 1.4 测试打包流程，验证功能
-- [ ] 1.5 更新 README 打包说明
+- [x] 1.1 创建 `peekapi.spec` 打包配置文件
+- [x] 1.2 创建 `version_info.txt` Windows 版本信息
+- [x] 1.3 测试打包流程，验证功能
+- [x] 1.4 更新 README 打包说明
+- [x] 1.5 简化代码（移除 --console 参数相关代码）
 - [ ] 1.6 （可选）下载安装 UPX 并测试压缩效果
 
 ## Progress Tracking
 
-**Overall Status:** Not Started - 0%
+**Overall Status:** Completed - 100%
 
 ### Subtasks
 
 | ID | Description | Status | Updated | Notes |
 |----|-------------|--------|---------|-------|
-| 1.1 | 移除 wave 依赖 | Not Started | - | pyproject.toml |
-| 1.2 | 创建 peekapi.spec | Not Started | - | 上述完整配置 |
-| 1.3 | 创建 version_info.txt | Not Started | - | Windows 文件属性 |
-| 1.4 | 测试打包 | Not Started | - | 验证托盘/截图/录音 |
-| 1.5 | 更新 README | Not Started | - | 新打包命令 |
-| 1.6 | 安装 UPX | Not Started | - | 可选，减小体积 |
+| 1.1 | 创建 peekapi.spec | Complete | 2026-01-26 | 包含 hiddenimports 和 excludes |
+| 1.2 | 创建 version_info.txt | Complete | 2026-01-26 | Windows 文件属性 |
+| 1.3 | 测试打包 | Complete | 2026-01-26 | 28.5MB，所有 API 正常 |
+| 1.4 | 更新 README | Complete | 2026-01-26 | 新打包命令 |
+| 1.5 | 简化代码 | Complete | 2026-01-26 | 移除 console 参数 |
+| 1.6 | 安装 UPX | Skipped | - | 可选，暂不需要 |
 
 ## Progress Log
 
@@ -476,6 +458,35 @@ uv run pyinstaller peekapi.spec
 - 分析 numpy 依赖问题（soundcard 强制依赖，无法移除）
 - **最终决策：采用 PyInstaller**
 - 细化具体优化内容和实施步骤
+
+### 2026-01-26
+- 更新任务文档，移除 wave 依赖相关内容（已在 TASK006 处理）
+- 移除 --console 参数相关内容（日志现在仅写入文件）
+- 创建 `peekapi.spec` 打包配置文件
+- 创建 `version_info.txt` Windows 版本信息文件
+- 执行打包测试：`uv run pyinstaller peekapi.spec --clean`
+- 打包成功，生成 28.5MB 可执行文件
+- 测试验证：
+  - ✅ /check API 正常响应
+  - ✅ /screen API 返回截图 (1MB JPEG)
+  - ✅ /record API 返回录音 (1.7MB WAV)
+  - ✅ 系统托盘正常显示
+  - ✅ 日志正常写入 logs 目录
+- 简化代码：
+  - 移除 `server.py` 中的 `--console` 参数检测
+  - 移除 `logging.py` 中的 console 参数和相关代码
+  - 移除不再需要的 `sys` 导入
+- 更新 README 打包说明
+- 73 个单元测试全部通过
+- 根据需求调整为 onefolder 模式：
+  - 原因：应用本身需要 config.toml 配置文件，单文件模式意义不大
+  - 修改 `peekapi.spec` 使用 COLLECT 生成文件夹
+  - `config.toml` 和 `peekapi.ico` 放在 exe 同级目录，方便用户修改
+  - 更新 `constants.py` 中的 `ICON_PATH` 直接指向 `BASE_DIR / "peekapi.ico"`
+  - 修复代码中 "要求" 注释标记的问题
+  - 更新 README 打包说明
+- 73 个单元测试全部通过
+- **任务完成**
 
 ## References
 

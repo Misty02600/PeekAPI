@@ -14,13 +14,14 @@ dependencies = [
     "pystray>=0.19.5,<0.20.0",
     "winotify>=1.1.0,<2.0.0",
     "soundcard>=0.4.5,<0.5.0",
+    "soundfile>=0.13.0",
     "numpy>=2.0.0,<2.3.0",
     "msgspec>=0.20.0",
     "loguru>=0.7.3",
 ]
 
 [project.scripts]
-peekapi = "peekapi.server:start_app"
+peekapi = "peekapi.__main__:main"
 
 [dependency-groups]
 dev = [

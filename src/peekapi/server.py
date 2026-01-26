@@ -1,5 +1,4 @@
 import io
-import sys
 from threading import Thread
 
 from flask import Flask, request, send_file
@@ -56,19 +55,21 @@ def favicon():
         return '', 204
 
 def start_app():
-    # 检查命令行参数
-    console = "--console" in sys.argv or "--debug" in sys.argv
-    setup_logging(console=console)
+    # 初始化日志系统（日志仅写入文件）
+    setup_logging()
 
     show_notification("Peek API已启动", "")
     try:
         # 启动录音
         recorder.start_recording()
+        logger.info("录音线程已启动")
 
         # 启动系统托盘
         Thread(target=start_system_tray, daemon=True).start()
+        logger.info("系统托盘线程已启动")
 
         # 启动 Flask 服务器
+        logger.info(f"正在启动 Flask 服务器: {config.basic.host}:{config.basic.port}")
         server = Thread(target=lambda: app.run(
             host=config.basic.host,
             port=config.basic.port,
@@ -76,6 +77,7 @@ def start_app():
             use_reloader=False
         ), daemon=True)
         server.start()
+        logger.info("Flask 服务器线程已启动")
         server.join()
     except Exception as e:
         logger.error(f"服务器错误: {e}")

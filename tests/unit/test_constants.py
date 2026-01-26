@@ -59,18 +59,11 @@ class TestGetIconPath:
         assert constants.ICON_PATH == constants.BASE_DIR / "peekapi.ico"
 
     def test_frozen_mode(self, temp_dir):
-        """测试打包模式下图标路径（mock _MEIPASS）"""
-        fake_meipass = temp_dir / "_meipass"
-        fake_meipass.mkdir()
-        fake_icon = fake_meipass / "peekapi.ico"
-        fake_icon.write_text("")
+        """测试打包模式下图标路径（与 exe 同目录）"""
+        from src.peekapi import constants
 
-        with patch.object(sys, "frozen", True, create=True):
-            with patch.object(sys, "_MEIPASS", str(fake_meipass), create=True):
-                from src.peekapi.constants import _get_icon_path
-
-                result = _get_icon_path()
-                assert result == fake_icon
+        # onefolder 模式下图标在 exe 同目录，即 BASE_DIR
+        assert constants.ICON_PATH == constants.BASE_DIR / "peekapi.ico"
 
 
 class TestPathConstants:

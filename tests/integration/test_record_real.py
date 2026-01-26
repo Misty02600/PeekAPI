@@ -2,9 +2,9 @@
 
 import os
 import time
-import wave
 
 import pytest
+import soundfile as sf
 
 
 # CI 环境自动跳过
@@ -74,13 +74,11 @@ class TestRecordIntegration:
         audio = recorder.get_audio()
         audio.seek(0)
 
-        with wave.open(audio, 'rb') as wf:
-            assert wf.getnchannels() == 1
-            assert wf.getsampwidth() == 2  # 16-bit
-            assert wf.getframerate() == 44100
-            frames = wf.getnframes()
-            print(f"录制帧数: {frames}, 时长: {frames/44100:.2f}秒")
-            assert frames > 0
+        data, samplerate = sf.read(audio, dtype='int16')
+        assert samplerate == 44100
+        frames = len(data)
+        print(f"录制帧数: {frames}, 时长: {frames/44100:.2f}秒")
+        assert frames > 0
 
     def test_real_buffer_fills_over_time(self, recorder):
         """缓冲区随时间填充"""
@@ -115,9 +113,9 @@ class TestRecordIntegration:
         audio = recorder.get_audio()
         audio.seek(0)
 
-        with wave.open(audio, 'rb') as wf:
-            frames = wf.getnframes()
-            assert frames == 0, "录音前缓冲区应为空"
+        data, samplerate = sf.read(audio, dtype='int16')
+        frames = len(data)
+        assert frames == 0, "录音前缓冲区应为空"
 
 
 @pytest.mark.skipif(not has_audio_device(), reason="无可用音频设备")

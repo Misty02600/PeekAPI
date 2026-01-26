@@ -9,7 +9,7 @@ from pystray import MenuItem as Item
 from winotify import Notification
 
 from .config import config
-from .constants import ICON_PATH, LOG_DIR
+from .constants import APP_ID, ICON_PATH, LOG_DIR
 from .record import recorder
 
 
@@ -23,13 +23,14 @@ def create_icon():
         draw.rectangle([16, 16, 48, 48], fill="black")
         return image
 
+
 def show_notification(title, message):
     """显示 Windows 通知"""
     toast = Notification(
-        app_id="ChieriBotPeekAPI",
+        app_id=APP_ID,
         title=title,
         msg=message,
-        icon=str(ICON_PATH),
+        icon=str(ICON_PATH) if os.path.exists(ICON_PATH) else "",
         duration="short"
     )
     toast.show()

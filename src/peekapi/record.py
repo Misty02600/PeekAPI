@@ -2,17 +2,14 @@ import collections
 import io
 import threading
 import time
-import wave
 
 import numpy as np
 import soundcard as sc
+import soundfile as sf
 
 from .config import config
+from .constants import MAX_CONSECUTIVE_ERRORS, RECONNECT_DELAY_SECONDS
 from .logging import logger
-
-# 设备重连相关常量
-RECONNECT_DELAY_SECONDS = 2.0
-MAX_CONSECUTIVE_ERRORS = 5
 
 
 class AudioRecorder:
@@ -145,11 +142,8 @@ class AudioRecorder:
             if not self.buffer:
                 logger.warning("缓冲区为空，返回空WAV")
                 empty_audio = io.BytesIO()
-                with wave.open(empty_audio, 'wb') as wf:
-                    wf.setnchannels(self.channels)
-                    wf.setsampwidth(2)  # 16-bit
-                    wf.setframerate(self.rate)
-                    wf.writeframes(b'')
+                empty_audio.name = "audio.wav"  # soundfile 需要通过 name 属性推断格式
+                sf.write(empty_audio, np.array([], dtype=np.int16), self.rate, subtype="PCM_16")
                 empty_audio.seek(0)
                 return empty_audio
 
@@ -158,13 +152,11 @@ class AudioRecorder:
         logger.info(f"当前缓冲区大小: {len(current_buffer)} 样本")
 
         try:
+            audio_data = np.array(current_buffer, dtype=np.int16)
+
             wav_io = io.BytesIO()
-            with wave.open(wav_io, 'wb') as wf:
-                wf.setnchannels(self.channels)
-                wf.setsampwidth(2)  # 16-bit
-                wf.setframerate(self.rate)
-                audio_data = np.array(current_buffer, dtype=np.int16).tobytes()
-                wf.writeframes(audio_data)
+            wav_io.name = "audio.wav"  # soundfile 需要通过 name 属性推断格式
+            sf.write(wav_io, audio_data, self.rate, subtype="PCM_16")
 
             wav_io.seek(0)
             size = len(wav_io.getvalue())

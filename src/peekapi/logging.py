@@ -1,18 +1,12 @@
 """日志配置模块"""
 
-import sys
-
 from loguru import logger
 
 from .constants import LOG_DIR
 
 
-def setup_logging(console: bool = False) -> None:
-    """配置日志系统
-
-    Args:
-        console: 是否同时输出到控制台
-    """
+def setup_logging() -> None:
+    """配置日志系统，日志仅写入文件"""
     # 移除默认 handler
     logger.remove()
 
@@ -28,15 +22,6 @@ def setup_logging(console: bool = False) -> None:
         format="{time:YYYY-MM-DD HH:mm:ss} [{level}] {name}: {message}",
         level="INFO",
     )
-
-    # 控制台输出（可选）
-    if console:
-        logger.add(
-            sys.stderr,
-            format="<green>{time:HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>: {message}",
-            level="INFO",
-            colorize=True,
-        )
 
     logger.info("PeekAPI 日志系统初始化完成")
 

@@ -4,11 +4,11 @@ import io
 import struct
 import threading
 import time
-import wave
 from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
+import soundfile as sf
 
 
 class TestAudioRecorder:
@@ -158,10 +158,9 @@ class TestAudioRecorder:
         result = recorder.get_audio()
         result.seek(0)
 
-        with wave.open(result, 'rb') as wf:
-            assert wf.getnchannels() == 1
-            assert wf.getsampwidth() == 2  # 16-bit
-            assert wf.getframerate() == 44100
+        info = sf.info(result)
+        assert info.channels == 1
+        assert info.samplerate == 44100
 
     def test_get_audio_with_data_returns_wav(self, recorder_class):
         """验证有数据时返回包含数据的 WAV"""
@@ -176,9 +175,8 @@ class TestAudioRecorder:
         assert result is not None
         result.seek(0)
 
-        with wave.open(result, 'rb') as wf:
-            frames = wf.readframes(wf.getnframes())
-            assert len(frames) > 0
+        data, samplerate = sf.read(result, dtype='int16')
+        assert len(data) > 0
 
     def test_get_audio_wav_contains_correct_samples(self, recorder_class):
         """验证 WAV 文件包含正确的采样数据"""
@@ -191,11 +189,8 @@ class TestAudioRecorder:
         result = recorder.get_audio()
         result.seek(0)
 
-        with wave.open(result, 'rb') as wf:
-            frames = wf.readframes(wf.getnframes())
-            # 解包 16-bit 整数
-            samples = struct.unpack(f'<{len(frames)//2}h', frames)
-            assert list(samples) == test_samples
+        data, samplerate = sf.read(result, dtype='int16')
+        assert list(data) == test_samples
 
     def test_buffer_thread_safety(self, recorder_class):
         """验证缓冲区操作的线程安全性"""

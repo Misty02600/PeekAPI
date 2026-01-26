@@ -13,10 +13,11 @@
 ## **使用**
 
 ### **使用发布版本**
-- 下载 [release](https://github.com/Misty02600/PeekAPI/releases) 的 PeekAPI.exe，在同级目录创建 `config.toml` 文件，根据[配置](#配置)写入内容，运行程序。
-- 若电脑无公网且在远程电脑调用API，需要搭配 frp 使用。
-- 可以使用 `peekapi --console` 运行以在控制台显示日志。
-- 日志文件存储在 exe 同目录的 `logs` 文件夹，可通过系统托盘菜单"打开日志"快速访问。
+- 下载 [release](https://github.com/Misty02600/PeekAPI/releases) 的 PeekAPI.zip 并解压
+- 根据[配置](#配置)修改 `config.toml` 文件
+- 运行 `peekapi.exe`
+- 若电脑无公网且在远程电脑调用API，需要搭配 frp 使用
+- 日志文件存储在 `logs` 文件夹，可通过系统托盘菜单"打开日志"快速访问
 
 ### **开发环境运行**
 1. 安装 Python >= 3.11 和 [uv](https://github.com/astral-sh/uv)
@@ -26,15 +27,20 @@
    ```
 3. 运行程序：
    ```bash
-   uv run peekapi          # 标准模式
-   uv run peekapi --console  # 调试模式（控制台输出）
+   uv run peekapi
    ```
 
-### **打包为 exe**
+### **打包**
 ```bash
 uv sync --group dev
-uv run pyinstaller --noconsole --onefile --name peekapi --icon peekapi.ico run.py
+uv run pyinstaller peekapi.spec
 ```
+
+打包后的文件在 `dist/peekapi/` 目录，包含：
+- `peekapi.exe` - 主程序
+- `config.toml` - 配置文件
+- `peekapi.ico` - 图标（可自定义）
+- `_internal/` - 依赖文件
 
 ## **配置**
 
@@ -69,15 +75,3 @@ gain = 20      # 音量增益倍数
 | **`duration`**     | 录音时间（秒）                            | `20`          |
 | **`gain`**        | 音量增益倍数                              | `20`          |
 
-
-## **许可证**
-
-本项目采用 MIT 许可证。
-
-## **Todo**
-
-- [ ] 支持 Linux 平台（[详细方案](docs/plan.md)）
-
-## **鸣谢**
-
-参考了 [ChieriBot peek API](https://github.com/chinosk6/ChieriBot_peek_API) 的代码
