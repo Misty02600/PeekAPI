@@ -9,8 +9,8 @@ import soundfile as sf
 
 # CI 环境自动跳过
 pytestmark = pytest.mark.skipif(
-    os.environ.get('CI') or os.environ.get('GITHUB_ACTIONS'),
-    reason="集成测试需要真实音频设备，CI 环境跳过"
+    os.environ.get("CI") or os.environ.get("GITHUB_ACTIONS"),
+    reason="集成测试需要真实音频设备，CI 环境跳过",
 )
 
 
@@ -18,6 +18,7 @@ def has_audio_device():
     """检测是否有可用音频设备"""
     try:
         import soundcard as sc
+
         speaker = sc.default_speaker()
         return speaker is not None
     except Exception:
@@ -32,7 +33,8 @@ class TestRecordIntegration:
     def recorder(self):
         """创建真实 AudioRecorder 实例"""
         from src.peekapi.record import AudioRecorder
-        rec = AudioRecorder(rate=44100, channels=1, duration=3, gain=1.0)
+
+        rec = AudioRecorder(rate=44100, duration=3, gain=1.0)
         yield rec
         # 清理
         if rec.is_recording:
@@ -41,7 +43,6 @@ class TestRecordIntegration:
     def test_real_recorder_init(self, recorder):
         """真实 AudioRecorder 初始化"""
         assert recorder.rate == 44100
-        assert recorder.channels == 1
         assert recorder.is_recording is False
 
     def test_real_start_stop_recording(self, recorder):
@@ -64,7 +65,7 @@ class TestRecordIntegration:
         assert audio is not None
         audio.seek(0)
         data = audio.read()
-        assert data[:4] == b'RIFF', "应返回有效 WAV"
+        assert data[:4] == b"RIFF", "应返回有效 WAV"
 
     def test_real_wav_has_audio_data(self, recorder):
         """WAV 文件包含音频数据"""
@@ -74,10 +75,10 @@ class TestRecordIntegration:
         audio = recorder.get_audio()
         audio.seek(0)
 
-        data, samplerate = sf.read(audio, dtype='int16')
+        data, samplerate = sf.read(audio, dtype="int16")
         assert samplerate == 44100
         frames = len(data)
-        print(f"录制帧数: {frames}, 时长: {frames/44100:.2f}秒")
+        print(f"录制帧数: {frames}, 时长: {frames / 44100:.2f}秒")
         assert frames > 0
 
     def test_real_buffer_fills_over_time(self, recorder):
@@ -113,7 +114,7 @@ class TestRecordIntegration:
         audio = recorder.get_audio()
         audio.seek(0)
 
-        data, samplerate = sf.read(audio, dtype='int16')
+        data, samplerate = sf.read(audio, dtype="int16")
         frames = len(data)
         assert frames == 0, "录音前缓冲区应为空"
 

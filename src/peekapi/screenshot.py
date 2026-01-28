@@ -1,8 +1,10 @@
 import io
+
 import mss
 from PIL import Image, ImageFilter
 
-def screenshot(radius, main_screen_only):
+
+def screenshot(radius: float, main_screen_only: bool) -> bytes:
     with mss.mss() as sct:
         if main_screen_only:
             monitor = sct.monitors[1]
@@ -19,6 +21,7 @@ def screenshot(radius, main_screen_only):
     img_byte = io.BytesIO()
     img_pil.save(img_byte, format="JPEG", quality=95)
     return img_byte.getvalue()
+
 
 if __name__ == "__main__":
     all_screens_data = screenshot(radius=3, main_screen_only=False)

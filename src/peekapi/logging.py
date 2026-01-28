@@ -6,12 +6,20 @@ from .constants import LOG_DIR
 
 
 def setup_logging() -> None:
-    """配置日志系统，日志仅写入文件"""
-    # 移除默认 handler
+    """配置日志系统，日志输出到控制台和文件"""
+    # 移除默认 handler（重新配置格式）
     logger.remove()
 
     # 确保日志目录存在
     LOG_DIR.mkdir(exist_ok=True)
+
+    # 控制台日志
+    logger.add(
+        sink=lambda msg: print(msg, end=""),
+        format="{time:HH:mm:ss} [{level}] {message}",
+        level="INFO",
+        colorize=True,
+    )
 
     # 文件日志（按日期轮转）
     logger.add(

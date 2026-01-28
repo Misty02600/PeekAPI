@@ -228,6 +228,7 @@ __marimo__/
 
 # Local
 logs/
+.sandbox/
 
 # ai
 .github/instructions/

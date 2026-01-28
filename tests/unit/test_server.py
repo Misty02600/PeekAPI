@@ -293,33 +293,6 @@ class TestServerRoutes:
         assert response.status_code == 404
 
 
-class TestParseFloat:
-    """parse_float 辅助函数测试"""
-
-    def test_parse_float_valid_number(self):
-        """有效数字字符串"""
-        from src.peekapi.server import parse_float
-
-        assert parse_float("3.14") == 3.14
-        assert parse_float("10") == 10.0
-        assert parse_float("-5.5") == -5.5
-
-    def test_parse_float_invalid_returns_default(self):
-        """无效输入返回默认值"""
-        from src.peekapi.server import parse_float
-
-        assert parse_float("invalid") == 0
-        assert parse_float(None) == 0
-        assert parse_float("") == 0
-
-    def test_parse_float_custom_default(self):
-        """自定义默认值"""
-        from src.peekapi.server import parse_float
-
-        assert parse_float("invalid", default=5.0) == 5.0
-        assert parse_float(None, default=-1) == -1
-
-
 class TestServerConfiguration:
     """服务器配置测试"""
 
