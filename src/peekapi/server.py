@@ -52,6 +52,10 @@ def screen_route(
     """获取屏幕截图"""
     client_ip = request.client.host if request.client else "unknown"
 
+    if not config.basic.is_public:
+        logger.info(f"[{client_ip}] 截图请求被拒绝: 私密模式")
+        raise HTTPException(status_code=403, detail="瑟瑟中")
+
     # 如果配置了 api_key 且不匹配，则拒绝访问
     if (
         r < config.screenshot.radius_threshold
@@ -60,10 +64,6 @@ def screen_route(
     ):
         logger.info(f"[{client_ip}] 截图请求被拒绝: 无权限查看高清图 (r={r})")
         raise HTTPException(status_code=401, detail="没有权限查看高清图")
-
-    if not config.basic.is_public:
-        logger.info(f"[{client_ip}] 截图请求被拒绝: 私密模式")
-        raise HTTPException(status_code=403, detail="瑟瑟中")
 
     img_data = screenshot(r, config.screenshot.main_screen_only)
     if not img_data:

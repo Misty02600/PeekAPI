@@ -1,7 +1,7 @@
 [basic]
 is_public = true  # 程序启动时默认是否为公开模式
 api_key = "Imkei" # 低模糊度下获取截图的key
-host = "0.0.0.0"  # 监听IP
+host = "127.0.0.1"  # 监听IP
 port = 1920       # 监听端口
 
 [screenshot]
