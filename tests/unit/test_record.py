@@ -1,7 +1,5 @@
 """音频录制模块测试"""
 
-import io
-import struct
 import threading
 import time
 from unittest.mock import MagicMock, patch
@@ -45,10 +43,10 @@ class TestAudioRecorder:
     @pytest.fixture
     def recorder_class(self):
         """返回未实例化的 AudioRecorder 类"""
-        with patch("src.peekapi.record.config") as mock_config:
+        with patch("peekapi.record.config") as mock_config:
             mock_config.record.duration = 8
             mock_config.record.gain = 1.0
-            from src.peekapi.record import AudioRecorder
+            from peekapi.record import AudioRecorder
 
             yield AudioRecorder
 
@@ -89,11 +87,11 @@ class TestAudioRecorder:
     def test_start_recording_sets_flag(self, recorder_class, mock_soundcard):
         """验证启动录音设置标志"""
         with patch(
-            "src.peekapi.record.sc.default_speaker",
+            "peekapi.record.sc.default_speaker",
             return_value=mock_soundcard["speaker"],
         ):
             with patch(
-                "src.peekapi.record.sc.get_microphone",
+                "peekapi.record.sc.get_microphone",
                 return_value=mock_soundcard["mic"],
             ):
                 recorder = recorder_class()
@@ -107,11 +105,11 @@ class TestAudioRecorder:
     def test_start_recording_ignores_duplicate(self, recorder_class, mock_soundcard):
         """验证重复启动录音被忽略"""
         with patch(
-            "src.peekapi.record.sc.default_speaker",
+            "peekapi.record.sc.default_speaker",
             return_value=mock_soundcard["speaker"],
         ):
             with patch(
-                "src.peekapi.record.sc.get_microphone",
+                "peekapi.record.sc.get_microphone",
                 return_value=mock_soundcard["mic"],
             ):
                 recorder = recorder_class()
@@ -132,11 +130,11 @@ class TestAudioRecorder:
     def test_stop_recording_clears_flag(self, recorder_class, mock_soundcard):
         """验证停止录音清除标志"""
         with patch(
-            "src.peekapi.record.sc.default_speaker",
+            "peekapi.record.sc.default_speaker",
             return_value=mock_soundcard["speaker"],
         ):
             with patch(
-                "src.peekapi.record.sc.get_microphone",
+                "peekapi.record.sc.get_microphone",
                 return_value=mock_soundcard["mic"],
             ):
                 recorder = recorder_class()
@@ -192,7 +190,7 @@ class TestAudioRecorder:
         assert result is not None
         result.seek(0)
 
-        data, samplerate = sf.read(result, dtype="int16")
+        data, _samplerate = sf.read(result, dtype="int16")
         assert len(data) > 0
 
     def test_get_audio_wav_contains_correct_samples(self, recorder_class):
@@ -206,7 +204,7 @@ class TestAudioRecorder:
         result = recorder.get_audio()
         result.seek(0)
 
-        data, samplerate = sf.read(result, dtype="int16")
+        data, _samplerate = sf.read(result, dtype="int16")
         assert list(data) == test_samples
 
     def test_buffer_thread_safety(self, recorder_class):
@@ -261,10 +259,10 @@ class TestRecorderDeviceHandling:
     @pytest.fixture
     def recorder_class(self):
         """返回未实例化的 AudioRecorder 类"""
-        with patch("src.peekapi.record.config") as mock_config:
+        with patch("peekapi.record.config") as mock_config:
             mock_config.record.duration = 8
             mock_config.record.gain = 1.0
-            from src.peekapi.record import AudioRecorder
+            from peekapi.record import AudioRecorder
 
             yield AudioRecorder
 
@@ -276,9 +274,9 @@ class TestRecorderDeviceHandling:
 
         mock_mic = MagicMock()
 
-        with patch("src.peekapi.record.sc.default_speaker", return_value=mock_speaker):
+        with patch("peekapi.record.sc.default_speaker", return_value=mock_speaker):
             with patch(
-                "src.peekapi.record.sc.get_microphone", return_value=mock_mic
+                "peekapi.record.sc.get_microphone", return_value=mock_mic
             ) as mock_get_mic:
                 recorder = recorder_class()
                 result = recorder._get_loopback_mic()
@@ -290,7 +288,7 @@ class TestRecorderDeviceHandling:
 
     def test_get_loopback_mic_no_speaker(self, recorder_class):
         """验证无默认扬声器时返回 None"""
-        with patch("src.peekapi.record.sc.default_speaker", return_value=None):
+        with patch("peekapi.record.sc.default_speaker", return_value=None):
             recorder = recorder_class()
             result = recorder._get_loopback_mic()
 
@@ -299,7 +297,7 @@ class TestRecorderDeviceHandling:
     def test_get_loopback_mic_exception(self, recorder_class):
         """验证获取设备异常时返回 None"""
         with patch(
-            "src.peekapi.record.sc.default_speaker",
+            "peekapi.record.sc.default_speaker",
             side_effect=Exception("Device error"),
         ):
             recorder = recorder_class()

@@ -53,35 +53,18 @@ def main():
 
     base_url = f"http://{args.host}:{args.port}"
 
-    print("=" * 50)
-    print("🎤 PeekAPI 录音 API 测试")
-    print("=" * 50)
-    print(f"🌐 目标服务: {base_url}")
-    print()
 
     # 发送请求
-    print("📡 发送请求...")
     try:
         with httpx.Client(timeout=60) as client:
             response = client.get(f"{base_url}/record")
     except httpx.ConnectError:
-        print(f"❌ 连接失败：无法连接到 {base_url}")
-        print("   请确保 PeekAPI 服务正在运行")
         return 1
     except httpx.TimeoutException:
-        print("❌ 请求超时（录音生成可能需要较长时间）")
         return 1
 
-    print()
-    print(f"📊 响应状态码: {response.status_code}")
-    print(f"📋 Content-Type: {response.headers.get('Content-Type', 'N/A')}")
-    print(
-        f"📦 响应大小: {len(response.content):,} bytes ({len(response.content) / 1024:.1f} KB)"
-    )
-    print()
 
     if response.status_code == 200:
-        print("✅ 请求成功！")
 
         if args.save:
             output_dir = ensure_output_dir()
@@ -92,21 +75,17 @@ def main():
             with open(output_path, "wb") as f:
                 f.write(response.content)
 
-            print(f"💾 已保存到: {output_path}")
-            print("💡 提示: 使用系统播放器打开文件试听")
         else:
-            print("💡 提示: 添加 --save 参数可保存录音")
+            pass
 
     elif response.status_code == 403:
-        print("⚠️ 访问被拒绝：服务处于私密模式")
-        print(f"   响应: {response.text}")
+        pass
 
     elif response.status_code == 500:
-        print("❌ 服务器错误：录音获取失败")
-        print(f"   响应: {response.text}")
+        pass
 
     else:
-        print(f"❓ 未知响应: {response.text}")
+        pass
 
     return 0
 

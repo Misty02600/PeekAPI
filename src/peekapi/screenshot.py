@@ -27,9 +27,7 @@ if __name__ == "__main__":
     all_screens_data = screenshot(radius=3, main_screen_only=False)
     with open("screenshot_all.jpg", "wb") as f:
         f.write(all_screens_data)
-    print("已保存: screenshot_all.jpg")
 
     main_screen_data = screenshot(radius=3, main_screen_only=True)
     with open("screenshot_main.jpg", "wb") as f:
         f.write(main_screen_data)
-    print("已保存: screenshot_main.jpg")

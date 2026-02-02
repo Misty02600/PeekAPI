@@ -14,13 +14,12 @@ Examples:
 
 import argparse
 import sys
-from datetime import datetime
 
 import httpx
 
 
 def test_endpoint(
-    base_url: str, method: str, path: str, params: dict = None, name: str = ""
+    base_url: str, method: str, path: str, params: dict | None, name: str
 ) -> dict:
     """测试单个端点"""
     url = f"{base_url}{path}"
@@ -77,13 +76,6 @@ def main():
 
     base_url = f"http://{args.host}:{args.port}"
 
-    print("=" * 60)
-    print("🔬 PeekAPI 完整 API 测试")
-    print("=" * 60)
-    print(f"🌐 目标服务: {base_url}")
-    print(f"⏰ 测试时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print()
-
     # 定义测试用例
     test_cases = [
         ("get", "/check", None, "健康检查 (GET)"),
@@ -100,50 +92,30 @@ def main():
             ("get", "/screen", {"r": 0, "k": args.api_key}, "截图 (带密钥)")
         )
 
-    print("📋 测试用例:")
-    for method, path, params, name in test_cases:
-        print(f"   • {name}: {method.upper()} {path}")
-    print()
-
     # 执行测试
-    print("🚀 开始测试...")
-    print("-" * 60)
 
     results = []
     for method, path, params, name in test_cases:
-        print(f"   测试: {name}...", end=" ")
         result = test_endpoint(base_url, method, path, params, name)
         results.append(result)
 
         if result["error"]:
-            print(f"❌ {result['error']}")
+            pass
         elif result["success"]:
-            print(f"✅ {result['status']} ({result['size']:,} bytes)")
+            pass
         else:
-            print(f"⚠️ {result['status']}")
-
-    print("-" * 60)
-    print()
+            pass
 
     # 汇总结果
     success_count = sum(1 for r in results if r["success"])
     error_count = sum(1 for r in results if r["error"])
     total_count = len(results)
 
-    print("📊 测试结果汇总:")
-    print(f"   ✅ 成功: {success_count}/{total_count}")
-    print(f"   ⚠️ 非 200: {total_count - success_count - error_count}/{total_count}")
-    print(f"   ❌ 错误: {error_count}/{total_count}")
-    print()
-
     if error_count > 0:
-        print("💡 提示: 有连接错误，请检查服务是否正在运行")
         return 1
     elif success_count == total_count:
-        print("🎉 所有测试通过！")
         return 0
     else:
-        print("💡 提示: 部分端点返回非 200 状态码，可能是正常的权限限制")
         return 0
 
 

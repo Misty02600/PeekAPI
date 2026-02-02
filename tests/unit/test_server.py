@@ -2,7 +2,6 @@
 
 import io
 from unittest.mock import patch
-from pathlib import Path
 
 import pytest
 from fastapi.testclient import TestClient
@@ -15,8 +14,8 @@ class TestServerRoutes:
     def app_client(self):
         """创建 FastAPI 测试客户端"""
         # Mock 依赖模块
-        with patch("src.peekapi.server.recorder") as mock_recorder:
-            with patch("src.peekapi.server.config") as mock_config:
+        with patch("peekapi.server.recorder") as mock_recorder:
+            with patch("peekapi.server.config") as mock_config:
                 # 设置默认配置
                 mock_config.basic.is_public = True
                 mock_config.basic.api_key = ""
@@ -30,7 +29,7 @@ class TestServerRoutes:
                 mock_audio.seek(0)
                 mock_recorder.get_audio.return_value = mock_audio
 
-                from src.peekapi.server import app
+                from peekapi.server import app
 
                 client = TestClient(app, raise_server_exceptions=False)
 
@@ -62,7 +61,7 @@ class TestServerRoutes:
         """公开模式下 /screen 返回图片"""
         mock_img_data = b"\xff\xd8\xff" + b"\x00" * 100  # JPEG 魔数
 
-        with patch("src.peekapi.server.screenshot", return_value=mock_img_data):
+        with patch("peekapi.server.screenshot", return_value=mock_img_data):
             response = app_client["client"].get("/screen")
 
         assert response.status_code == 200
@@ -72,7 +71,7 @@ class TestServerRoutes:
         """私密模式下 /screen 返回 403"""
         app_client["config"].basic.is_public = False
 
-        with patch("src.peekapi.server.screenshot", return_value=b"test"):
+        with patch("peekapi.server.screenshot", return_value=b"test"):
             response = app_client["client"].get("/screen")
 
         assert response.status_code == 403
@@ -83,7 +82,7 @@ class TestServerRoutes:
         mock_img_data = b"\xff\xd8\xff" + b"\x00" * 100
 
         with patch(
-            "src.peekapi.server.screenshot", return_value=mock_img_data
+            "peekapi.server.screenshot", return_value=mock_img_data
         ) as mock_screenshot:
             app_client["client"].get("/screen?r=15")
 
@@ -95,9 +94,7 @@ class TestServerRoutes:
         """无效的模糊半径使用默认值 0"""
         mock_img_data = b"\xff\xd8\xff" + b"\x00" * 100
 
-        with patch(
-            "src.peekapi.server.screenshot", return_value=mock_img_data
-        ) as mock_screenshot:
+        with patch("peekapi.server.screenshot", return_value=mock_img_data):
             # FastAPI 会拒绝无效的 float，需要测试 422 或使用有效值
             response = app_client["client"].get("/screen?r=invalid")
 
@@ -121,7 +118,7 @@ class TestServerRoutes:
         app_client["config"].screenshot.radius_threshold = 10
         mock_img_data = b"\xff\xd8\xff" + b"\x00" * 100
 
-        with patch("src.peekapi.server.screenshot", return_value=mock_img_data):
+        with patch("peekapi.server.screenshot", return_value=mock_img_data):
             response = app_client["client"].get("/screen?r=5&k=secret123")
 
         assert response.status_code == 200
@@ -132,7 +129,7 @@ class TestServerRoutes:
         app_client["config"].screenshot.radius_threshold = 10
         mock_img_data = b"\xff\xd8\xff" + b"\x00" * 100
 
-        with patch("src.peekapi.server.screenshot", return_value=mock_img_data):
+        with patch("peekapi.server.screenshot", return_value=mock_img_data):
             # r=15 超过阈值，不需要 key
             response = app_client["client"].get("/screen?r=15")
 
@@ -140,7 +137,7 @@ class TestServerRoutes:
 
     def test_screen_failure_returns_500(self, app_client):
         """截图失败返回 500"""
-        with patch("src.peekapi.server.screenshot", return_value=None):
+        with patch("peekapi.server.screenshot", return_value=None):
             response = app_client["client"].get("/screen")
 
         assert response.status_code == 500
@@ -152,7 +149,7 @@ class TestServerRoutes:
         app_client["config"].screenshot.main_screen_only = True
 
         with patch(
-            "src.peekapi.server.screenshot", return_value=mock_img_data
+            "peekapi.server.screenshot", return_value=mock_img_data
         ) as mock_screenshot:
             app_client["client"].get("/screen")
 
@@ -165,7 +162,7 @@ class TestServerRoutes:
         app_client["config"].screenshot.main_screen_only = False
 
         with patch(
-            "src.peekapi.server.screenshot", return_value=mock_img_data
+            "peekapi.server.screenshot", return_value=mock_img_data
         ) as mock_screenshot:
             app_client["client"].get("/screen")
 
@@ -177,7 +174,7 @@ class TestServerRoutes:
         app_client["config"].screenshot.radius_threshold = 10
         mock_img_data = b"\xff\xd8\xff" + b"\x00" * 100
 
-        with patch("src.peekapi.server.screenshot", return_value=mock_img_data):
+        with patch("peekapi.server.screenshot", return_value=mock_img_data):
             # r=0 低于阈值，但无 API Key 配置
             response = app_client["client"].get("/screen?r=0")
 
@@ -189,7 +186,7 @@ class TestServerRoutes:
         app_client["config"].screenshot.radius_threshold = 10
         mock_img_data = b"\xff\xd8\xff" + b"\x00" * 100
 
-        with patch("src.peekapi.server.screenshot", return_value=mock_img_data):
+        with patch("peekapi.server.screenshot", return_value=mock_img_data):
             # r=10 等于阈值，不需要 key（只有 r < threshold 才需要）
             response = app_client["client"].get("/screen?r=10")
 
@@ -249,40 +246,26 @@ class TestServerRoutes:
         # WAV 文件以 RIFF 开头
         assert response.content[:4] == b"RIFF"
 
-    def test_record_check_before_public(self, app_client):
-        """验证 /record 先获取音频再检查 is_public"""
+    def test_record_check_public_first(self, app_client):
+        """验证 /record 在私密模式下先检查 is_public 而不获取音频"""
         app_client["config"].basic.is_public = False
 
         response = app_client["client"].get("/record")
 
-        # 即使 is_public=False，recorder.get_audio 仍会被调用
-        app_client["recorder"].get_audio.assert_called_once()
+        # is_public=False 时，先拒绝请求，不会调用 get_audio
+        app_client["recorder"].get_audio.assert_not_called()
         assert response.status_code == 403
 
     # ============ /favicon.ico 端点测试 ============
 
-    def test_favicon_returns_icon_or_204(self, app_client):
-        """favicon 返回图标或 204"""
+    def test_favicon_not_implemented(self, app_client):
+        """favicon 端点未实现，返回 404"""
         response = app_client["client"].get("/favicon.ico")
 
-        # 可能返回图标文件或 204（文件不存在时）
-        assert response.status_code in [200, 204]
+        # 服务器未实现 favicon 端点
+        assert response.status_code == 404
 
-    def test_favicon_file_not_found(self, app_client):
-        """图标文件不存在时返回 204"""
-        # Mock Path.exists 来模拟文件不存在的情况
-        original_exists = Path.exists
-
-        def mock_exists(self):
-            if "peekapi.ico" in str(self):
-                return False
-            return original_exists(self)
-
-        with patch.object(Path, "exists", mock_exists):
-            response = app_client["client"].get("/favicon.ico")
-
-        # 返回 204（文件不存在）
-        assert response.status_code == 204
+    # favicon 端点未实现，相关测试已合并到 test_favicon_not_implemented
 
     # ============ 404 测试 ============
 
@@ -298,9 +281,9 @@ class TestServerConfiguration:
 
     def test_app_exists(self):
         """验证 FastAPI app 实例存在"""
-        with patch("src.peekapi.server.recorder"):
-            with patch("src.peekapi.server.config"):
-                from src.peekapi.server import app
+        with patch("peekapi.server.recorder"):
+            with patch("peekapi.server.config"):
+                from peekapi.server import app
 
                 assert app is not None
                 assert app.title == "PeekAPI"

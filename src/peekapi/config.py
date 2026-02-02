@@ -1,7 +1,6 @@
 """配置管理模块"""
 
-from msgspec import Struct, field
-from msgspec import toml
+from msgspec import Struct, field, toml
 
 from .constants import CONFIG_PATH
 

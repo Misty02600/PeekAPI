@@ -66,14 +66,8 @@ def main():
 
     base_url = f"http://{args.host}:{args.port}"
 
-    print("=" * 50)
-    print("📸 PeekAPI 截图 API 测试")
-    print("=" * 50)
-    print(f"🌐 目标服务: {base_url}")
-    print(f"🔵 模糊半径: {args.blur}")
     if args.api_key:
-        print(f"🔑 API 密钥: {args.api_key[:4]}***")
-    print()
+        pass
 
     # 构建请求参数
     params = {"r": args.blur}
@@ -81,28 +75,16 @@ def main():
         params["k"] = args.api_key
 
     # 发送请求
-    print("📡 发送请求...")
     try:
         with httpx.Client(timeout=30) as client:
             response = client.get(f"{base_url}/screen", params=params)
     except httpx.ConnectError:
-        print(f"❌ 连接失败：无法连接到 {base_url}")
-        print("   请确保 PeekAPI 服务正在运行")
         return 1
     except httpx.TimeoutException:
-        print("❌ 请求超时")
         return 1
 
-    print()
-    print(f"📊 响应状态码: {response.status_code}")
-    print(f"📋 Content-Type: {response.headers.get('Content-Type', 'N/A')}")
-    print(
-        f"📦 响应大小: {len(response.content):,} bytes ({len(response.content) / 1024:.1f} KB)"
-    )
-    print()
 
     if response.status_code == 200:
-        print("✅ 请求成功！")
 
         if args.save:
             output_dir = ensure_output_dir()
@@ -113,24 +95,20 @@ def main():
             with open(output_path, "wb") as f:
                 f.write(response.content)
 
-            print(f"💾 已保存到: {output_path}")
         else:
-            print("💡 提示: 添加 --save 参数可保存截图")
+            pass
 
     elif response.status_code == 401:
-        print("⚠️ 认证失败：需要 API 密钥或提高模糊半径")
-        print(f"   响应: {response.text}")
+        pass
 
     elif response.status_code == 403:
-        print("⚠️ 访问被拒绝：服务处于私密模式")
-        print(f"   响应: {response.text}")
+        pass
 
     elif response.status_code == 500:
-        print("❌ 服务器错误：截图失败")
-        print(f"   响应: {response.text}")
+        pass
 
     else:
-        print(f"❓ 未知响应: {response.text}")
+        pass
 
     return 0
 

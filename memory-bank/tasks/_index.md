@@ -24,6 +24,8 @@
 
 ## Completed
 
+- [TASK011] CI 代码检查修复 - ✅ 2026-02-02 完成（ruff、basedpyright、pytest 全部通过）
+
 - [TASK002] 重构 Config 模块使用 msgspec - ✅ 2026-01-25 完成
 - [TASK003] 日志系统迁移到 loguru - ✅ 2026-01-25 完成
 - [TASK004] 为项目编写单元测试 - ✅ 2026-01-25 完成（63 测试，75% 覆盖率）
@@ -42,13 +44,13 @@
 
 ## 任务统计
 
-| 状态        | 数量  |
-| ----------- | ----- |
-| In Progress | 0     |
-| Pending     | 2     |
-| Completed   | 7     |
-| Abandoned   | 0     |
-| **总计**    | **9** |
+| 状态        | 数量   |
+| ----------- | ------ |
+| In Progress | 0      |
+| Pending     | 2      |
+| Completed   | 8      |
+| Abandoned   | 0      |
+| **总计**    | **10** |
 
 ---
 
