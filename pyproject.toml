@@ -1,12 +1,10 @@
 [project]
 name = "peekapi"
 version = "0.1.0"
-description = ""
-authors = [
-    { name = "Misty", email = "74812967+Misty02600@users.noreply.github.com" },
-]
+description = "A local API service for screen capture and audio recording"
 readme = "README.md"
-requires-python = ">=3.11,<3.14"
+requires-python = ">=3.11"
+authors = [{ name = "Misty", email = "xiao02600@gmail.com" }]
 dependencies = [
     "pillow>=11.1.0,<12.0.0",
     "mss>=10.0.0,<11.0.0",
@@ -20,27 +18,39 @@ dependencies = [
     "loguru>=0.7.3",
 ]
 
-[project.scripts]
-peekapi = "peekapi.__main__:main"
-
 [dependency-groups]
 dev = [
+    "basedpyright>=1.16.0",
+    "commitizen>=4.1.0",
+    "git-cliff>=2.11.0,<3.0.0",
+    "prek>=0.2.0",
+    "ruff>=0.14.13,<1.0.0",
     "pyinstaller>=6.12.0",
-    "pytest>=9.0.2",
+    { include-group = "test" },
+]
+test = [
+    "pytest>=8.0.0",
     "pytest-cov>=7.0.0",
+    "pytest-xdist>=3.0.0",
     "httpx>=0.28.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/Misty02600/PeekAPI"
+
+[project.scripts]
+peekapi = "peekapi.__main__:main"
 
 [build-system]
 requires = ["uv_build>=0.9.18,<0.10.0"]
 build-backend = "uv_build"
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_functions = ["test_*"]
-addopts = "-v --tb=short"
-markers = ["integration: 集成测试，需要真实硬件环境"]
+[tool.commitizen]
+name = "cz_conventional_commits"
+version = "0.1.0"
+tag_format = "v$version"
+version_files = ["pyproject.toml:^version"]
+major_version_zero = true
 
 [tool.coverage.run]
 source = ["src/peekapi"]
@@ -48,7 +58,66 @@ omit = ["*/__pycache__/*", "*/tests/*"]
 
 [tool.coverage.report]
 exclude_lines = [
+    "raise NotImplementedError",
     "pragma: no cover",
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
+    "@overload",
+    "except ImportError:",
 ]
+
+[tool.pyright]
+include = ["src", "tests"]
+pythonVersion = "3.11"
+pythonPlatform = "All"
+typeCheckingMode = "standard"
+
+[[tool.pyright.executionEnvironments]]
+root = "tests"
+reportPrivateUsage = "none"
+reportUnknownMemberType = "none"
+
+[tool.pytest]
+addopts = ["--import-mode=importlib", "--strict-markers", "--tb=short", "-ra"]
+testpaths = ["tests"]
+pythonpath = ["src", "tests"]
+
+[tool.ruff]
+line-length = 88
+src = ["src", "tests"]
+
+[tool.ruff.format]
+line-ending = "lf"
+
+[tool.ruff.lint]
+select = [
+    "F",
+    "W",
+    "E",
+    "I",
+    "B",
+    "UP",
+    "ASYNC",
+    "C4",
+    "T10",
+    "T20",
+    "PYI",
+    "PT",
+    "Q",
+    "TID",
+    "RUF",
+]
+ignore = [
+    "E501",
+    "E402",
+    "UP037",
+    "RUF001",
+    "RUF002",
+    "RUF003",
+    "W191",
+    "TID252",
+    "B008",
+]
+
+[tool.ruff.lint.isort]
+extra-standard-library = ["typing_extensions"]

@@ -1,9 +1,8 @@
 """配置模块测试"""
 
-import pytest
 from msgspec import toml
 
-from src.peekapi.config import BasicConfig, Config, RecordConfig, ScreenshotConfig
+from peekapi.config import BasicConfig, Config, RecordConfig, ScreenshotConfig
 
 
 class TestBasicConfig:

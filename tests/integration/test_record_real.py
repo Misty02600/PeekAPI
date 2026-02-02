@@ -6,10 +6,9 @@ import time
 import pytest
 import soundfile as sf
 
-
 # CI 环境自动跳过
 pytestmark = pytest.mark.skipif(
-    os.environ.get("CI") or os.environ.get("GITHUB_ACTIONS"),
+    bool(os.environ.get("CI") or os.environ.get("GITHUB_ACTIONS")),
     reason="集成测试需要真实音频设备，CI 环境跳过",
 )
 
@@ -32,7 +31,7 @@ class TestRecordIntegration:
     @pytest.fixture
     def recorder(self):
         """创建真实 AudioRecorder 实例"""
-        from src.peekapi.record import AudioRecorder
+        from peekapi.record import AudioRecorder
 
         rec = AudioRecorder(rate=44100, duration=3, gain=1.0)
         yield rec
@@ -78,7 +77,6 @@ class TestRecordIntegration:
         data, samplerate = sf.read(audio, dtype="int16")
         assert samplerate == 44100
         frames = len(data)
-        print(f"录制帧数: {frames}, 时长: {frames / 44100:.2f}秒")
         assert frames > 0
 
     def test_real_buffer_fills_over_time(self, recorder):
@@ -95,7 +93,6 @@ class TestRecordIntegration:
         audio2.seek(0)
         size2 = len(audio2.read())
 
-        print(f"0.3秒后: {size1} 字节, 0.8秒后: {size2} 字节")
         assert size2 > size1, "缓冲区应随时间增长"
 
     def test_real_recorder_health_status(self, recorder):
@@ -106,7 +103,6 @@ class TestRecordIntegration:
         time.sleep(0.5)  # 等待设备连接
 
         # 如果设备正常，应该变为 healthy
-        print(f"录音健康状态: {recorder.is_healthy}")
         # 不强制断言，因为设备可能有问题
 
     def test_real_empty_buffer_before_recording(self, recorder):
@@ -114,7 +110,7 @@ class TestRecordIntegration:
         audio = recorder.get_audio()
         audio.seek(0)
 
-        data, samplerate = sf.read(audio, dtype="int16")
+        data, _samplerate = sf.read(audio, dtype="int16")
         frames = len(data)
         assert frames == 0, "录音前缓冲区应为空"
 
@@ -129,7 +125,6 @@ class TestLoopbackDevice:
 
         speaker = sc.default_speaker()
         assert speaker is not None
-        print(f"默认扬声器: {speaker.name}")
 
     def test_can_get_loopback_mic(self):
         """获取 Loopback 麦克风"""
@@ -138,4 +133,3 @@ class TestLoopbackDevice:
         speaker = sc.default_speaker()
         mic = sc.get_microphone(include_loopback=True, id=str(speaker.id))
         assert mic is not None
-        print(f"Loopback 麦克风: {mic.name}")

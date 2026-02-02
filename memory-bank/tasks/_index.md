@@ -18,10 +18,13 @@
 ## Pending
 
 - [TASK001] 支持 Linux 平台 - 替换 Windows 专用依赖，实现跨平台支持
+- [TASK010] GitHub Release 自动发布 EXE - 配置 CI 自动打包并发布到 GitHub Releases
 
 ---
 
 ## Completed
+
+- [TASK011] CI 代码检查修复 - ✅ 2026-02-02 完成（ruff、basedpyright、pytest 全部通过）
 
 - [TASK002] 重构 Config 模块使用 msgspec - ✅ 2026-01-25 完成
 - [TASK003] 日志系统迁移到 loguru - ✅ 2026-01-25 完成
@@ -41,14 +44,14 @@
 
 ## 任务统计
 
-| 状态        | 数量  |
-| ----------- | ----- |
-| In Progress | 0     |
-| Pending     | 1     |
-| Completed   | 7     |
-| Abandoned   | 0     |
-| **总计**    | **8** |
+| 状态        | 数量   |
+| ----------- | ------ |
+| In Progress | 0      |
+| Pending     | 2      |
+| Completed   | 8      |
+| Abandoned   | 0      |
+| **总计**    | **10** |
 
 ---
 
-*最后更新: 2026-01-28*
+*最后更新: 2026-02-02*

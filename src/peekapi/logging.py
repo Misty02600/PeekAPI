@@ -1,5 +1,7 @@
 """日志配置模块"""
 
+import sys
+
 from loguru import logger
 
 from .constants import LOG_DIR
@@ -15,7 +17,7 @@ def setup_logging() -> None:
 
     # 控制台日志
     logger.add(
-        sink=lambda msg: print(msg, end=""),
+        sink=sys.stderr,
         format="{time:HH:mm:ss} [{level}] {message}",
         level="INFO",
         colorize=True,

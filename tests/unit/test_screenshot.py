@@ -15,7 +15,7 @@ class TestScreenshot:
         """模拟 mss 截图库"""
         # 创建 100x100 的测试图像数据 (RGB)
         width, height = 100, 100
-        rgb_data = b'\xff\x00\x00' * (width * height)  # 红色像素
+        rgb_data = b"\xff\x00\x00" * (width * height)  # 红色像素
 
         mock_img = MagicMock()
         mock_img.size = (width, height)
@@ -30,12 +30,12 @@ class TestScreenshot:
         mock_sct.__enter__ = MagicMock(return_value=mock_sct)
         mock_sct.__exit__ = MagicMock(return_value=False)
 
-        with patch('src.peekapi.screenshot.mss.mss', return_value=mock_sct):
+        with patch("peekapi.screenshot.mss.mss", return_value=mock_sct):
             yield mock_sct
 
     def test_screenshot_returns_bytes(self, mock_mss):
         """验证截图返回字节数据"""
-        from src.peekapi.screenshot import screenshot
+        from peekapi.screenshot import screenshot
 
         result = screenshot(radius=0, main_screen_only=True)
 
@@ -44,26 +44,26 @@ class TestScreenshot:
 
     def test_screenshot_returns_valid_jpeg(self, mock_mss):
         """验证返回有效的 JPEG 格式（检查魔数）"""
-        from src.peekapi.screenshot import screenshot
+        from peekapi.screenshot import screenshot
 
         result = screenshot(radius=0, main_screen_only=True)
 
         # JPEG 文件以 \xff\xd8\xff 开头
-        assert result[:3] == b'\xff\xd8\xff', "返回的不是有效的 JPEG 格式"
+        assert result[:3] == b"\xff\xd8\xff", "返回的不是有效的 JPEG 格式"
 
     def test_screenshot_can_open_as_image(self, mock_mss):
         """验证返回的数据可以作为图像打开"""
-        from src.peekapi.screenshot import screenshot
+        from peekapi.screenshot import screenshot
 
         result = screenshot(radius=0, main_screen_only=True)
         img = Image.open(io.BytesIO(result))
 
-        assert img.format == 'JPEG'
+        assert img.format == "JPEG"
         assert img.size == (100, 100)
 
     def test_screenshot_main_screen_only(self, mock_mss):
         """验证 main_screen_only=True 使用 monitors[1]"""
-        from src.peekapi.screenshot import screenshot
+        from peekapi.screenshot import screenshot
 
         screenshot(radius=0, main_screen_only=True)
 
@@ -74,7 +74,7 @@ class TestScreenshot:
 
     def test_screenshot_all_screens(self, mock_mss):
         """验证 main_screen_only=False 使用 monitors[0]"""
-        from src.peekapi.screenshot import screenshot
+        from peekapi.screenshot import screenshot
 
         screenshot(radius=0, main_screen_only=False)
 
@@ -85,11 +85,11 @@ class TestScreenshot:
 
     def test_screenshot_with_blur_calls_filter(self, mock_mss):
         """验证 radius > 0 时调用 filter 方法"""
-        from src.peekapi.screenshot import screenshot
+        from peekapi.screenshot import screenshot
 
-        with patch('PIL.Image.Image.filter') as mock_filter:
+        with patch("PIL.Image.Image.filter") as mock_filter:
             # 返回原图以完成后续处理
-            mock_filter.return_value = Image.new('RGB', (100, 100), color='red')
+            mock_filter.return_value = Image.new("RGB", (100, 100), color="red")
 
             screenshot(radius=10, main_screen_only=True)
 
@@ -98,9 +98,9 @@ class TestScreenshot:
 
     def test_screenshot_no_blur_radius_zero(self, mock_mss):
         """验证 radius=0 时不调用 filter 方法"""
-        from src.peekapi.screenshot import screenshot
+        from peekapi.screenshot import screenshot
 
-        with patch('PIL.Image.Image.filter') as mock_filter:
+        with patch("PIL.Image.Image.filter") as mock_filter:
             screenshot(radius=0, main_screen_only=True)
 
             # 验证 filter 未被调用
@@ -108,11 +108,12 @@ class TestScreenshot:
 
     def test_screenshot_blur_applies_gaussian(self, mock_mss):
         """验证模糊使用 GaussianBlur 滤镜"""
-        from src.peekapi.screenshot import screenshot
         from PIL import ImageFilter
 
-        with patch('PIL.Image.Image.filter') as mock_filter:
-            mock_filter.return_value = Image.new('RGB', (100, 100), color='red')
+        from peekapi.screenshot import screenshot
+
+        with patch("PIL.Image.Image.filter") as mock_filter:
+            mock_filter.return_value = Image.new("RGB", (100, 100), color="red")
 
             screenshot(radius=15, main_screen_only=True)
 

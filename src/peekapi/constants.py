@@ -14,7 +14,8 @@ def _get_base_dir() -> Path:
 def _get_icon_path() -> Path:
     """获取图标路径：打包后从 _MEIPASS，开发时为运行目录"""
     if getattr(sys, "frozen", False):
-        return Path(sys._MEIPASS) / "peekapi.ico"
+        meipass: str = getattr(sys, "_MEIPASS", "")
+        return Path(meipass) / "peekapi.ico"
     return _get_base_dir() / "peekapi.ico"
 
 
@@ -26,7 +27,7 @@ LOG_DIR = BASE_DIR / "logs"
 
 # 录音相关常量
 RECONNECT_DELAY_SECONDS = 2.0  # 设备重连延迟（秒）
-MAX_CONSECUTIVE_ERRORS = 5     # 最大连续错误次数
+MAX_CONSECUTIVE_ERRORS = 5  # 最大连续错误次数
 
 # 应用信息
 APP_ID = "PeekAPI"

@@ -43,15 +43,7 @@ def main():
 
     base_url = f"http://{args.host}:{args.port}"
 
-    print("=" * 50)
-    print("🏥 PeekAPI 健康检查 API 测试")
-    print("=" * 50)
-    print(f"🌐 目标服务: {base_url}")
-    print(f"📝 请求方法: {args.method.upper()}")
-    print()
-
     # 发送请求
-    print("📡 发送请求...")
     try:
         with httpx.Client(timeout=10) as client:
             if args.method == "get":
@@ -59,22 +51,14 @@ def main():
             else:
                 response = client.post(f"{base_url}/check")
     except httpx.ConnectError:
-        print(f"❌ 连接失败：无法连接到 {base_url}")
-        print("   请确保 PeekAPI 服务正在运行")
         return 1
     except httpx.TimeoutException:
-        print("❌ 请求超时")
         return 1
 
-    print()
-    print(f"📊 响应状态码: {response.status_code}")
-    print(f"📋 响应内容: {response.text}")
-    print()
-
     if response.status_code == 200 and response.text == "ok":
-        print("✅ 服务健康！PeekAPI 正常运行")
+        pass
     else:
-        print("⚠️ 服务状态异常")
+        pass
 
     return 0
 
