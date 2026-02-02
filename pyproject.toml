@@ -25,23 +25,9 @@ dev = [
     "git-cliff>=2.11.0,<3.0.0",
     "prek>=0.2.0",
     "ruff>=0.14.13,<1.0.0",
-    "basedpyright>=1.16.0",
-    "commitizen>=4.1.0",
-    "git-cliff>=2.11.0,<3.0.0",
-    "prek>=0.2.0",
-    "ruff>=0.14.13,<1.0.0",
     "pyinstaller>=6.12.0",
     { include-group = "test" },
 ]
-test = ["pytest>=8.0.0", "pytest-cov>=7.0.0", "httpx>=0.28.0"]
-
-[project.urls]
-Homepage = "https://github.com/Misty02600/PeekAPI"
-
-[project.scripts]
-    { include-group = "test" },
-]
-peekapi = "peekapi.__main__:main"
 test = ["pytest>=8.0.0", "pytest-cov>=7.0.0", "httpx>=0.28.0"]
 
 [project.urls]
@@ -56,16 +42,10 @@ build-backend = "uv_build"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.1.0"                           # 当前版本
+version = "0.1.0"
 tag_format = "v$version"
 version_files = ["pyproject.toml:^version"]
-major_version_zero = true                   # 允许 0.x.x 版本号
-[tool.commitizen]
-name = "cz_conventional_commits"
-version = "0.1.0"                           # 当前版本
-tag_format = "v$version"
-version_files = ["pyproject.toml:^version"]
-major_version_zero = true                   # 允许 0.x.x 版本号
+major_version_zero = true
 
 [tool.coverage.run]
 source = ["src/peekapi"]
@@ -73,7 +53,6 @@ omit = ["*/__pycache__/*", "*/tests/*"]
 
 [tool.coverage.report]
 exclude_lines = [
-    "raise NotImplementedError",
     "raise NotImplementedError",
     "pragma: no cover",
     "if __name__ == .__main__.:",
@@ -83,144 +62,57 @@ exclude_lines = [
 ]
 
 [tool.pyright]
-include = ["src", "tests"] # 要检查的目录
-pythonVersion = "3.11"     # 目标 Python 版本
-pythonPlatform = "All"     # 目标平台：All | Linux | Windows | Darwin
-# typeCheckingMode 类型检查严格程度，可选值：
-#   - "off"：      关闭类型检查
-#   - "basic"：    基础检查（仅报告明确的类型错误）
-#   - "standard"： 标准检查（推荐，平衡严格性与实用性）
-#   - "strict"：   严格检查（要求完整的类型注解，适合新项目）
-#   - "all"：      最严格（启用所有检查，可能产生大量警告）
+include = ["src", "tests"]
+pythonVersion = "3.11"
+pythonPlatform = "All"
 typeCheckingMode = "standard"
 
-# 测试目录的特殊配置（放宽部分规则以适应测试场景）
 [[tool.pyright.executionEnvironments]]
 root = "tests"
-reportPrivateUsage = "none"      # 允许测试访问私有属性 (_variable)
-reportUnknownMemberType = "none" # 允许 Mock 对象等动态类型
+reportPrivateUsage = "none"
+reportUnknownMemberType = "none"
 
 [tool.pytest]
-addopts = [
-    "--import-mode=importlib", # 使用 importlib 导入模式（推荐，避免 sys.path 污染）
-    "--strict-markers",        # 严格标记模式（未注册的 marker 会报错）
-    "--tb=short",              # 简短的错误回溯（减少输出噪音）
-    "-ra",                     # 显示所有非通过测试的摘要（a=all except passed）
-]
-testpaths = ["tests"] # 仅运行 tests 目录下的测试
-pythonpath = ["src", "tests"] # 添加到 Python 路径，确保模块可导入
+addopts = ["--import-mode=importlib", "--strict-markers", "--tb=short", "-ra"]
+testpaths = ["tests"]
+pythonpath = ["src", "tests"]
 
 [tool.ruff]
-line-length = 88       # 每行最大字符数（与 Black 保持一致）
-src = ["src", "tests"] # 源代码目录（用于判断导入是本地模块还是第三方模块）
+line-length = 88
+src = ["src", "tests"]
 
 [tool.ruff.format]
-line-ending = "lf" # 行尾符：lf（Unix）| crlf（Windows）| auto | native
+line-ending = "lf"
 
 [tool.ruff.lint]
-# 启用的规则集，每个字母代码对应一组规则
 select = [
-    "F",     # Pyflakes：基础语法和逻辑错误检查
-    "W",     # pycodestyle warnings：PEP 8 风格警告
-    "E",     # pycodestyle errors：PEP 8 风格错误
-    "I",     # isort：导入语句排序
-    "B",     # flake8-bugbear：发现潜在 bug 和设计问题
-    "UP",    # pyupgrade：升级到新版 Python 语法
-    "ASYNC", # flake8-async：异步代码最佳实践
-    "C4",    # flake8-comprehensions：推导式优化建议
-    "T10",   # flake8-debugger：检测遗留的调试器语句（如 pdb）
-    "T20",   # flake8-print：检测 print 语句（生产代码应使用 logging）
-    "PYI",   # flake8-pyi：类型存根文件（.pyi）规范检查
-    "PT",    # flake8-pytest-style：pytest 代码风格检查
-    "Q",     # flake8-quotes：引号使用规范
-    "TID",   # flake8-tidy-imports：导入语句整理
-    "RUF",   # Ruff-specific：Ruff 特有的规则
+    "F",
+    "W",
+    "E",
+    "I",
+    "B",
+    "UP",
+    "ASYNC",
+    "C4",
+    "T10",
+    "T20",
+    "PYI",
+    "PT",
+    "Q",
+    "TID",
+    "RUF",
 ]
-# 忽略的规则（根据项目需求放宽）
 ignore = [
-    "E501",   # 行长度由 formatter 控制，lint 不重复检查
-    "E402",   # 允许模块导入不在文件顶部（某些情况下需要先执行代码）
-    "UP037",  # 允许使用引号包裹的类型注解（前向引用）
-    "RUF001", # 允许字符串中的中文等 Unicode 字符
-    "RUF002", # 允许文档字符串中的中文等 Unicode 字符
-    "RUF003", # 允许注释中的中文等 Unicode 字符
-    "W191",   # 允许使用制表符缩进
-    "TID252", # 允许使用相对导入
-    "B008",   # 允许在函数参数默认值中使用函数调用
+    "E501",
+    "E402",
+    "UP037",
+    "RUF001",
+    "RUF002",
+    "RUF003",
+    "W191",
+    "TID252",
+    "B008",
 ]
 
 [tool.ruff.lint.isort]
-"@overload",
-"except ImportError:",
-]
-
-extra-standard-library = ["typing_extensions"] # 将 typing_extensions 视为标准库
-[tool.pyright]
-include = ["src", "tests"] # 要检查的目录
-pythonVersion = "3.11"     # 目标 Python 版本
-pythonPlatform = "All"     # 目标平台：All | Linux | Windows | Darwin
-# typeCheckingMode 类型检查严格程度，可选值：
-#   - "off"：      关闭类型检查
-#   - "basic"：    基础检查（仅报告明确的类型错误）
-#   - "standard"： 标准检查（推荐，平衡严格性与实用性）
-#   - "strict"：   严格检查（要求完整的类型注解，适合新项目）
-#   - "all"：      最严格（启用所有检查，可能产生大量警告）
-typeCheckingMode = "standard"
-
-# 测试目录的特殊配置（放宽部分规则以适应测试场景）
-[[tool.pyright.executionEnvironments]]
-root = "tests"
-reportPrivateUsage = "none"      # 允许测试访问私有属性 (_variable)
-reportUnknownMemberType = "none" # 允许 Mock 对象等动态类型
-
-[tool.pytest]
-addopts = [
-    "--import-mode=importlib", # 使用 importlib 导入模式（推荐，避免 sys.path 污染）
-    "--strict-markers",        # 严格标记模式（未注册的 marker 会报错）
-    "--tb=short",              # 简短的错误回溯（减少输出噪音）
-    "-ra",                     # 显示所有非通过测试的摘要（a=all except passed）
-]
-testpaths = ["tests"] # 仅运行 tests 目录下的测试
-pythonpath = ["src", "tests"] # 添加到 Python 路径，确保模块可导入
-
-[tool.ruff]
-line-length = 88       # 每行最大字符数（与 Black 保持一致）
-src = ["src", "tests"] # 源代码目录（用于判断导入是本地模块还是第三方模块）
-
-[tool.ruff.format]
-line-ending = "lf" # 行尾符：lf（Unix）| crlf（Windows）| auto | native
-
-[tool.ruff.lint]
-# 启用的规则集，每个字母代码对应一组规则
-select = [
-    "F",     # Pyflakes：基础语法和逻辑错误检查
-    "W",     # pycodestyle warnings：PEP 8 风格警告
-    "E",     # pycodestyle errors：PEP 8 风格错误
-    "I",     # isort：导入语句排序
-    "B",     # flake8-bugbear：发现潜在 bug 和设计问题
-    "UP",    # pyupgrade：升级到新版 Python 语法
-    "ASYNC", # flake8-async：异步代码最佳实践
-    "C4",    # flake8-comprehensions：推导式优化建议
-    "T10",   # flake8-debugger：检测遗留的调试器语句（如 pdb）
-    "T20",   # flake8-print：检测 print 语句（生产代码应使用 logging）
-    "PYI",   # flake8-pyi：类型存根文件（.pyi）规范检查
-    "PT",    # flake8-pytest-style：pytest 代码风格检查
-    "Q",     # flake8-quotes：引号使用规范
-    "TID",   # flake8-tidy-imports：导入语句整理
-    "RUF",   # Ruff-specific：Ruff 特有的规则
-]
-# 忽略的规则（根据项目需求放宽）
-ignore = [
-    "E501",   # 行长度由 formatter 控制，lint 不重复检查
-    "E402",   # 允许模块导入不在文件顶部（某些情况下需要先执行代码）
-    "UP037",  # 允许使用引号包裹的类型注解（前向引用）
-    "RUF001", # 允许字符串中的中文等 Unicode 字符
-    "RUF002", # 允许文档字符串中的中文等 Unicode 字符
-    "RUF003", # 允许注释中的中文等 Unicode 字符
-    "W191",   # 允许使用制表符缩进
-    "TID252", # 允许使用相对导入
-    "B008",   # 允许在函数参数默认值中使用函数调用
-]
-
-[tool.ruff.lint.isort]
-extra-standard-library = ["typing_extensions"] # 将 typing_extensions 视为标准库
+extra-standard-library = ["typing_extensions"]
