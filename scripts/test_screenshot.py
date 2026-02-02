@@ -83,9 +83,7 @@ def main():
     except httpx.TimeoutException:
         return 1
 
-
     if response.status_code == 200:
-
         if args.save:
             output_dir = ensure_output_dir()
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

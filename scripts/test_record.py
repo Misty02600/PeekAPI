@@ -53,7 +53,6 @@ def main():
 
     base_url = f"http://{args.host}:{args.port}"
 
-
     # 发送请求
     try:
         with httpx.Client(timeout=60) as client:
@@ -63,9 +62,7 @@ def main():
     except httpx.TimeoutException:
         return 1
 
-
     if response.status_code == 200:
-
         if args.save:
             output_dir = ensure_output_dir()
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

@@ -16,19 +16,15 @@ run:
 
 # 运行所有测试
 test:
-    uv run pytest
+    uv run pytest -n auto
 
 # 运行单元测试
 test-unit:
-    uv run pytest tests/unit -v
+    uv run pytest tests/unit -n auto
 
 # 运行集成测试
 test-integration:
-    uv run pytest tests/integration -v
-
-# 运行测试并生成覆盖率报告
-test-cov:
-    uv run pytest --cov=src/peekapi --cov-report=html
+    uv run pytest tests/integration -n auto
 
 # ===== 打包 =====
 
@@ -47,16 +43,12 @@ build-size: build
 # ===== 代码质量 =====
 
 # 格式化代码
-fmt:
-    uv run ruff format src tests
+format:
+    uv run ruff format .
 
 # 检查代码
 lint:
-    uv run ruff check src tests
-
-# 修复代码问题
-fix:
-    uv run ruff check --fix src tests
+    uv run ruff check . --fix
 
 # 类型检查
 check:

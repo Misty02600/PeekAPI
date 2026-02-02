@@ -43,7 +43,6 @@ def main():
 
     base_url = f"http://{args.host}:{args.port}"
 
-
     # 发送请求
     try:
         with httpx.Client(timeout=10) as client:
@@ -55,7 +54,6 @@ def main():
         return 1
     except httpx.TimeoutException:
         return 1
-
 
     if response.status_code == 200 and response.text == "ok":
         pass
