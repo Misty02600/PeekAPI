@@ -9,10 +9,7 @@ jobs:
   release:
     name: Release
     runs-on: windows-latest
-    environment:
-      name: release
     permissions:
-      id-token: write
       contents: write
     steps:
       - name: Checkout
@@ -53,11 +50,19 @@ jobs:
           uv sync
           uv run pyinstaller peekapi.spec --noconfirm
 
+      - name: Create ZIP archive
+        uses: thedoctor0/zip-release@0.7.6
+        with:
+          type: 'zip'
+          filename: 'PeekAPI-${{ steps.version.outputs.TAG_NAME }}-windows.zip'
+          directory: 'dist'
+          path: 'peekapi'
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          name: PeekAPI ${{ steps.version.outputs.TAG_NAME }}
           body: ${{ steps.changelog.outputs.content }}
-          files: |
-            dist/peekapi/**
+          files: dist/PeekAPI-${{ steps.version.outputs.TAG_NAME }}-windows.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
