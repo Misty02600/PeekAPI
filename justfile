@@ -57,3 +57,28 @@ lint:
 # 修复代码问题
 fix:
     uv run ruff check --fix src tests
+
+# 类型检查
+check:
+    uv run basedpyright
+
+# ===== 版本管理 =====
+
+# 版本发布（更新版本号、更新 lock 文件）
+bump:
+    uv run cz bump
+    uv lock
+
+# 生成 changelog
+changelog:
+    uv run git-cliff --latest
+
+# ===== prek =====
+
+# 安装 prek hooks
+hooks:
+    uv run prek install
+
+# 更新 prek hooks
+update:
+    uv run prek auto-update
