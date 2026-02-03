@@ -411,3 +411,20 @@ wav_io = io.BytesIO()  # ~689 KB + 44 bytes 头
 | 使用 pystray   | 跨平台系统托盘支持                   |
 | 使用 msgspec   | 配置验证和类型安全                   |
 | 环形缓冲区     | 固定内存占用，自动管理旧数据         |
+
+### PyInstaller 打包注意事项
+
+**无窗口模式下的 stderr 问题：**
+
+当使用 `console=False` 打包时，`sys.stdout` 和 `sys.stderr` 都为 `None`。如果代码尝试向这些流写入数据（包括日志输出），程序会立即崩溃。
+
+**解决方案**：在输出日志到 stderr 前检测其是否可用：
+
+```python
+if sys.stderr is not None:
+    logger.add(sink=sys.stderr, ...)
+```
+
+这确保了：
+- 开发模式和 `console=True` 模式下正常输出控制台日志
+- `console=False` 模式下跳过控制台日志，仅输出到文件

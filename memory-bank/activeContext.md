@@ -9,6 +9,9 @@
 
 ## 最近变更
 
+- 2026-02-03: 修复 exe 打包后系统托盘图标不显示问题
+  - 根因：`console=False` 模式下 `sys.stderr` 为 `None`，日志写入导致崩溃
+  - 修复：在 `logging.py` 中添加 stderr 可用性检测
 - 2026-02-02: CI 代码检查全面修复（ruff、basedpyright、pytest 全部通过）
   - 修复导入路径：`src.peekapi` → `peekapi`
   - 修复类型问题：`sys._MEIPASS`、`pytest.mark.skipif`

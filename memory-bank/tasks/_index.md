@@ -24,6 +24,7 @@
 
 ## Completed
 
+- [TASK012] 系统托盘图标不显示 - ✅ 2026-02-03 完成（修复 stderr 为 None 导致崩溃）
 - [TASK011] CI 代码检查修复 - ✅ 2026-02-02 完成（ruff、basedpyright、pytest 全部通过）
 
 - [TASK002] 重构 Config 模块使用 msgspec - ✅ 2026-01-25 完成
@@ -48,10 +49,10 @@
 | ----------- | ------ |
 | In Progress | 0      |
 | Pending     | 2      |
-| Completed   | 8      |
+| Completed   | 9      |
 | Abandoned   | 0      |
-| **总计**    | **10** |
+| **总计**    | **11** |
 
 ---
 
-*最后更新: 2026-02-02*
+*最后更新: 2026-02-03*

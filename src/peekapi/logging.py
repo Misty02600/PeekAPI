@@ -15,13 +15,14 @@ def setup_logging() -> None:
     # 确保日志目录存在
     LOG_DIR.mkdir(exist_ok=True)
 
-    # 控制台日志
-    logger.add(
-        sink=sys.stderr,
-        format="{time:HH:mm:ss} [{level}] {message}",
-        level="INFO",
-        colorize=True,
-    )
+    # 控制台日志（仅在 stderr 可用时添加，无窗口模式下 stderr 为 None）
+    if sys.stderr is not None:
+        logger.add(
+            sink=sys.stderr,
+            format="{time:HH:mm:ss} [{level}] {message}",
+            level="INFO",
+            colorize=True,
+        )
 
     # 文件日志（按日期轮转）
     logger.add(
