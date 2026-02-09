@@ -256,6 +256,73 @@ class TestServerRoutes:
         app_client["recorder"].get_audio.assert_not_called()
         assert response.status_code == 403
 
+    # ============ /idle 端点测试 ============
+
+    def test_idle_public_mode_returns_json(self, app_client):
+        """公开模式下 /idle 返回 JSON"""
+        from datetime import datetime, timedelta, timezone
+
+        mock_idle_seconds = 123.456
+        mock_last_time = datetime.now(timezone(timedelta(hours=8)))
+
+        with patch(
+            "peekapi.server.get_idle_info",
+            return_value=(mock_idle_seconds, mock_last_time),
+        ):
+            response = app_client["client"].get("/idle")
+
+        assert response.status_code == 200
+        assert response.headers["content-type"] == "application/json"
+
+        data = response.json()
+        assert "idle_seconds" in data
+        assert "last_input_time" in data
+        assert data["idle_seconds"] == 123.456
+
+    def test_idle_private_mode_returns_403(self, app_client):
+        """私密模式下 /idle 返回 403"""
+        app_client["config"].basic.is_public = False
+
+        response = app_client["client"].get("/idle")
+
+        assert response.status_code == 403
+        assert "瑟瑟中" in response.content.decode("utf-8")
+
+    def test_idle_returns_valid_iso_datetime(self, app_client):
+        """验证返回的时间是有效的 ISO 格式"""
+        from datetime import datetime, timedelta, timezone
+
+        mock_last_time = datetime(
+            2026, 2, 9, 23, 0, 0, tzinfo=timezone(timedelta(hours=8))
+        )
+
+        with patch(
+            "peekapi.server.get_idle_info",
+            return_value=(10.5, mock_last_time),
+        ):
+            response = app_client["client"].get("/idle")
+
+        data = response.json()
+        # 验证可以解析回 datetime
+        parsed_time = datetime.fromisoformat(data["last_input_time"])
+        assert parsed_time == mock_last_time
+
+    def test_idle_seconds_rounded_to_3_decimals(self, app_client):
+        """验证空闲秒数保留 3 位小数"""
+        from datetime import datetime, timedelta, timezone
+
+        mock_last_time = datetime.now(timezone(timedelta(hours=8)))
+
+        with patch(
+            "peekapi.server.get_idle_info",
+            return_value=(123.456789, mock_last_time),
+        ):
+            response = app_client["client"].get("/idle")
+
+        data = response.json()
+        # 验证四舍五入到 3 位小数
+        assert data["idle_seconds"] == 123.457
+
     # ============ /favicon.ico 端点测试 ============
 
     def test_favicon_not_implemented(self, app_client):

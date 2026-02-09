@@ -6,6 +6,7 @@ from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import PlainTextResponse, Response
 
 from .config import config
+from .idle import get_idle_info
 from .logging import logger, setup_logging
 from .record import recorder
 from .screenshot import screenshot
@@ -91,6 +92,24 @@ def record_route(request: Request):
     audio_bytes = audio_data.read()
     logger.info(f"[{client_ip}] 录音请求成功")
     return Response(content=audio_bytes, media_type="audio/wav")
+
+
+@app.get("/idle")
+def idle_route(request: Request):
+    """获取用户空闲时间"""
+    client_ip = request.client.host if request.client else "unknown"
+
+    if not config.basic.is_public:
+        logger.info(f"[{client_ip}] 空闲时间请求被拒绝: 私密模式")
+        raise HTTPException(status_code=403, detail="瑟瑟中")
+
+    idle_seconds, last_input_time = get_idle_info()
+    logger.info(f"[{client_ip}] 空闲时间请求成功 (idle={idle_seconds:.1f}s)")
+
+    return {
+        "idle_seconds": round(idle_seconds, 3),
+        "last_input_time": last_input_time.isoformat(),
+    }
 
 
 @app.get("/check")
