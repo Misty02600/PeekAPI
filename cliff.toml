@@ -8,11 +8,6 @@ header = """
 """
 # 提交信息模板
 body = """
-{% if version -%}
-## [{{ version | trim_start_matches(pat="v") }}]
-## [Unreleased]
-{% endif %}
-
 {% for group, commits in commits | group_by(attribute="group") -%}
 ### {{ group | striptags | trim | upper_first }}
 {% for commit in commits -%}
