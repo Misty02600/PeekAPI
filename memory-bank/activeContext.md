@@ -9,6 +9,9 @@
 
 ## 最近变更
 
+- 2026-02-09: 添加用户空闲时间端点 (`/idle`)
+  - 使用 Windows GetLastInputInfo API 获取最后操作时间
+  - 返回空闲秒数和最后操作时间 (ISO 格式)
 - 2026-02-03: 修复 exe 打包后系统托盘图标不显示问题
   - 根因：`console=False` 模式下 `sys.stderr` 为 `None`，日志写入导致崩溃
   - 修复：在 `logging.py` 中添加 stderr 可用性检测
@@ -27,6 +30,7 @@
 ### 已完成功能
 - ✅ 屏幕截图 API (`/screen`)
 - ✅ 音频录制 API (`/record`)
+- ✅ 用户空闲时间 API (`/idle`)
 - ✅ 健康检查 API (`/check`)
 - ✅ 系统托盘管理
 - ✅ 公开/私密模式切换
