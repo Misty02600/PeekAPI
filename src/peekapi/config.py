@@ -9,6 +9,7 @@ class BasicConfig(Struct):
     """基础配置"""
 
     is_public: bool = True
+    device_name: str = ""  # 设备名称，留空则使用系统主机名
     api_key: str = ""
     host: str = "0.0.0.0"
     port: int = 1920

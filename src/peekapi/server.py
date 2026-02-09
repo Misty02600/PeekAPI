@@ -10,6 +10,7 @@ from .idle import get_idle_info
 from .logging import logger, setup_logging
 from .record import recorder
 from .screenshot import screenshot
+from .system_info import get_system_info
 from .system_tray import start_system_tray
 
 
@@ -110,6 +111,20 @@ def idle_route(request: Request):
         "idle_seconds": round(idle_seconds, 3),
         "last_input_time": last_input_time.isoformat(),
     }
+
+
+@app.get("/info")
+def info_route(request: Request):
+    """获取设备信息"""
+    client_ip = request.client.host if request.client else "unknown"
+
+    if not config.basic.is_public:
+        logger.info(f"[{client_ip}] 设备信息请求被拒绝: 私密模式")
+        raise HTTPException(status_code=403, detail="瑟瑟中")
+
+    info = get_system_info(config.basic.device_name)
+    logger.info(f"[{client_ip}] 设备信息请求成功")
+    return info
 
 
 @app.get("/check")

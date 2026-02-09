@@ -66,8 +66,9 @@ class TestIdleInfoMocked:
         """测试使用 mock 的 Windows API"""
         mock_windll = MagicMock()
 
-        # 模拟 GetTickCount 返回 10000ms (10秒)
-        mock_windll.kernel32.GetTickCount.return_value = 10000
+        # 模拟 GetTickCount64 返回 10000ms (10秒)
+        mock_get_tick_count_64 = MagicMock(return_value=10000)
+        mock_windll.kernel32.GetTickCount64 = mock_get_tick_count_64
 
         # LASTINPUTINFO.dwTime 模拟返回 5000ms (5秒前的最后输入)
         # 这意味着空闲时间为 10000 - 5000 = 5000ms = 5秒

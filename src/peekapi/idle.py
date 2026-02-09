@@ -34,9 +34,20 @@ def get_idle_info() -> tuple[float, datetime]:
     lii.cbSize = sizeof(LASTINPUTINFO)
     ctypes.windll.user32.GetLastInputInfo(ctypes.byref(lii))
 
-    # GetTickCount 返回系统启动后的毫秒数
-    current_tick = ctypes.windll.kernel32.GetTickCount()
-    idle_ms = current_tick - lii.dwTime
+    # 使用 GetTickCount64 避免 49.7 天溢出问题
+    GetTickCount64 = ctypes.windll.kernel32.GetTickCount64
+    GetTickCount64.restype = ctypes.c_uint64
+    current_tick = GetTickCount64()
+
+    # dwTime 是 32 位，需要处理回绕
+    # 取 current_tick 的低 32 位与 dwTime 比较
+    current_tick_32 = current_tick & 0xFFFFFFFF
+    if current_tick_32 >= lii.dwTime:
+        idle_ms = current_tick_32 - lii.dwTime
+    else:
+        # 回绕情况：dwTime 在 GetTickCount 回绕之前设置
+        idle_ms = (0xFFFFFFFF - lii.dwTime) + current_tick_32 + 1
+
     idle_seconds = idle_ms / 1000.0
 
     # 计算最后操作时间
