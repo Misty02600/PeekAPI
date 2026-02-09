@@ -18,12 +18,14 @@
 ## Pending
 
 - [TASK001] 支持 Linux 平台 - 替换 Windows 专用依赖，实现跨平台支持
-- [TASK010] GitHub Release 自动发布 EXE - 配置 CI 自动打包并发布到 GitHub Releases
 
 ---
 
 ## Completed
 
+- [TASK014] 修复 GetTickCount 溢出问题 - ✅ 2026-02-10 完成（使用 GetTickCount64）
+- [TASK010] GitHub Release 自动发布 EXE - ✅ 2026-02-10 完成（配置 CI 自动打包并发布到 GitHub Releases）
+- [TASK015] 添加设备信息端点 - ✅ 2026-02-10 完成（/info 端点获取硬件信息）
 - [TASK013] 添加用户空闲时间端点 - ✅ 2026-02-09 完成（/idle 端点获取用户空闲时间）
 - [TASK012] 系统托盘图标不显示 - ✅ 2026-02-03 完成（修复 stderr 为 None 导致崩溃）
 - [TASK011] CI 代码检查修复 - ✅ 2026-02-02 完成（ruff、basedpyright、pytest 全部通过）
@@ -49,11 +51,11 @@
 | 状态        | 数量   |
 | ----------- | ------ |
 | In Progress | 0      |
-| Pending     | 2      |
-| Completed   | 10     |
+| Pending     | 3      |
+| Completed   | 11     |
 | Abandoned   | 0      |
-| **总计**    | **12** |
+| **总计**    | **14** |
 
 ---
 
-*最后更新: 2026-02-09*
+*最后更新: 2026-02-10*
