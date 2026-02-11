@@ -51,8 +51,8 @@
 | 状态        | 数量   |
 | ----------- | ------ |
 | In Progress | 0      |
-| Pending     | 3      |
-| Completed   | 11     |
+| Pending     | 1      |
+| Completed   | 13     |
 | Abandoned   | 0      |
 | **总计**    | **14** |
 
