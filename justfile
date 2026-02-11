@@ -63,6 +63,7 @@ bump:
     git add uv.lock
     git commit --amend --no-edit --no-verify
     $version = (uv run cz version --project).Trim(); git tag -f "v$version"
+    git push --tags
 
 # 生成 changelog
 changelog:
