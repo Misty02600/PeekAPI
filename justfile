@@ -56,10 +56,13 @@ check:
 
 # ===== 版本管理 =====
 
-# 版本发布（更新版本号、更新 lock 文件）
+# 版本发布（更新版本号、更新 lock 文件、自动修正标签）
 bump:
     uv run cz bump
     uv lock
+    git add uv.lock
+    git commit --amend --no-edit --no-verify
+    $version = (uv run cz version --project).Trim(); git tag -f "v$version"
 
 # 生成 changelog
 changelog:
@@ -74,3 +77,15 @@ hooks:
 # 更新 prek hooks
 update:
     uv run prek auto-update
+
+# 从 dev 向 main 创建 PR
+pr:
+    gh pr create --base main --head dev --fill
+    gh pr view --web
+
+# PR 合并后同步 dev 到 main
+sync:
+    git fetch origin
+    git checkout dev
+    git reset --hard origin/main
+    git push origin dev --force-with-lease
