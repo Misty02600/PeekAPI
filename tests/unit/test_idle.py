@@ -88,3 +88,65 @@ class TestIdleInfoMocked:
 
             # 验证最后输入时间
             assert isinstance(last_input_time, datetime)
+
+    def test_get_idle_info_handles_32bit_wraparound(self):
+        """测试 32 位回绕情况（dwTime 在回绕前设置，current_tick 在回绕后）"""
+        mock_windll = MagicMock()
+
+        # 模拟 GetTickCount64 返回值：假设已超过 49.7 天
+        # current_tick 的低 32 位为 1000（刚回绕后）
+        # 即 current_tick = 0x100000000 + 1000 = 4294968296
+        current_tick_64 = 0x100000000 + 1000  # 回绕后 1 秒
+        mock_get_tick_count_64 = MagicMock(return_value=current_tick_64)
+        mock_windll.kernel32.GetTickCount64 = mock_get_tick_count_64
+
+        # dwTime 在回绕前设置，假设为 0xFFFFFFFF - 4000 = 4294963295
+        # 即在回绕前 4 秒
+        dwTime_before_wrap = 0xFFFFFFFF - 4000
+
+        def mock_get_last_input_info(lii_ref):
+            lii_ref._obj.dwTime = dwTime_before_wrap
+            return True
+
+        mock_windll.user32.GetLastInputInfo.side_effect = mock_get_last_input_info
+
+        with patch("peekapi.idle.ctypes.windll", mock_windll):
+            from peekapi.idle import get_idle_info
+
+            idle_seconds, last_input_time = get_idle_info()
+
+            # 预期空闲时间：从 dwTime 到回绕点 (4001ms) + 回绕后到 current_tick (1000ms)
+            # = (0xFFFFFFFF - dwTime) + current_tick_32 + 1
+            # = 4001 + 1000 = 5001ms = 5.001 秒
+            expected_idle_ms = (0xFFFFFFFF - dwTime_before_wrap) + 1000 + 1
+            expected_idle_seconds = expected_idle_ms / 1000.0
+
+            assert abs(idle_seconds - expected_idle_seconds) < 0.1
+            assert isinstance(last_input_time, datetime)
+
+    def test_get_idle_info_large_tick_count(self):
+        """测试大 tick count 值（接近 32 位上限但未回绕）"""
+        mock_windll = MagicMock()
+
+        # 模拟系统运行接近 49.7 天，current_tick 接近 32 位上限
+        current_tick_64 = 0xFFFFF000  # 接近 32 位最大值
+        mock_get_tick_count_64 = MagicMock(return_value=current_tick_64)
+        mock_windll.kernel32.GetTickCount64 = mock_get_tick_count_64
+
+        # dwTime 为 current_tick - 3000（3 秒前）
+        dwTime = current_tick_64 - 3000
+
+        def mock_get_last_input_info(lii_ref):
+            lii_ref._obj.dwTime = dwTime
+            return True
+
+        mock_windll.user32.GetLastInputInfo.side_effect = mock_get_last_input_info
+
+        with patch("peekapi.idle.ctypes.windll", mock_windll):
+            from peekapi.idle import get_idle_info
+
+            idle_seconds, last_input_time = get_idle_info()
+
+            # 预期空闲时间：3 秒
+            assert abs(idle_seconds - 3.0) < 0.1
+            assert isinstance(last_input_time, datetime)

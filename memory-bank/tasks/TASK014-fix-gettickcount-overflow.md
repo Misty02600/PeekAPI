@@ -1,6 +1,6 @@
 # [TASK014] - 修复 GetTickCount 溢出问题
 
-**Status:** Pending
+**Status:** Completed
 **Added:** 2026-02-10
 **Updated:** 2026-02-10
 **Priority:** High
@@ -11,7 +11,7 @@
 
 ## 问题分析
 
-### 当前代码
+### 当前代码（修复前）
 
 ```python
 # idle.py 第 38-40 行
@@ -35,7 +35,7 @@ idle_seconds = idle_ms / 1000.0
 
 ## Implementation Plan
 
-### 方案 A：使用 GetTickCount64（推荐）
+### 采用方案 A：使用 GetTickCount64
 
 ```python
 def get_idle_info() -> tuple[float, datetime]:
@@ -49,7 +49,6 @@ def get_idle_info() -> tuple[float, datetime]:
     current_tick = GetTickCount64()
 
     # dwTime 仍是 32 位，需处理回绕
-    # 计算差值时考虑 dwTime 可能比 current_tick 的低 32 位大（回绕情况）
     current_tick_32 = current_tick & 0xFFFFFFFF
     if current_tick_32 >= lii.dwTime:
         idle_ms = current_tick_32 - lii.dwTime
@@ -63,50 +62,18 @@ def get_idle_info() -> tuple[float, datetime]:
     return idle_seconds, last_input_time
 ```
 
-### 方案 B：设置 restype 并处理回绕
-
-```python
-def get_idle_info() -> tuple[float, datetime]:
-    lii = LASTINPUTINFO()
-    lii.cbSize = sizeof(LASTINPUTINFO)
-    ctypes.windll.user32.GetLastInputInfo(ctypes.byref(lii))
-
-    # 设置正确的返回类型
-    GetTickCount = ctypes.windll.kernel32.GetTickCount
-    GetTickCount.restype = ctypes.c_uint  # 无符号 32 位
-    current_tick = GetTickCount()
-
-    # 处理 32 位回绕
-    if current_tick >= lii.dwTime:
-        idle_ms = current_tick - lii.dwTime
-    else:
-        idle_ms = (0xFFFFFFFF - lii.dwTime) + current_tick + 1
-
-    idle_seconds = idle_ms / 1000.0
-    last_input_time = datetime.now(_BEIJING_TZ) - timedelta(seconds=idle_seconds)
-
-    return idle_seconds, last_input_time
-```
-
-### 推荐方案
-
-采用 **方案 A**，使用 `GetTickCount64`：
-- Windows Vista+ 都支持
-- 代码更清晰
-- 避免 49.7 天回绕问题
-
 ## Progress Tracking
 
-**Overall Status:** Not Started - 0%
+**Overall Status:** Completed - 100%
 
 ### Subtasks
 
-| ID  | Description                      | Status      | Updated    | Notes             |
-| --- | -------------------------------- | ----------- | ---------- | ----------------- |
-| 1   | 修改 idle.py 使用 GetTickCount64 | Not Started | 2026-02-10 |                   |
-| 2   | 添加 32 位回绕处理               | Not Started | 2026-02-10 | dwTime 仍是 32 位 |
-| 3   | 添加单元测试覆盖边界情况         | Not Started | 2026-02-10 |                   |
-| 4   | 更新文档                         | Not Started | 2026-02-10 |                   |
+| ID  | Description                      | Status   | Updated    | Notes                 |
+| --- | -------------------------------- | -------- | ---------- | --------------------- |
+| 1   | 修改 idle.py 使用 GetTickCount64 | Complete | 2026-02-10 | 使用 c_uint64         |
+| 2   | 添加 32 位回绕处理               | Complete | 2026-02-10 | dwTime 仍是 32 位     |
+| 3   | 添加单元测试覆盖边界情况         | Complete | 2026-02-10 | 增加 2 个回绕测试用例 |
+| 4   | 更新文档                         | Complete | 2026-02-10 | 任务文档已更新        |
 
 ## Progress Log
 
@@ -114,3 +81,9 @@ def get_idle_info() -> tuple[float, datetime]:
 - 创建任务
 - 分析问题根因
 - 设计修复方案
+- 实现 GetTickCount64 修复（方案 A）
+- 添加 32 位回绕边界测试用例
+  - `test_get_idle_info_handles_32bit_wraparound` - 测试回绕情况
+  - `test_get_idle_info_large_tick_count` - 测试接近上限值
+- 所有 7 个 idle 测试通过
+- 任务完成
