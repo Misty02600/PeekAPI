@@ -1,4 +1,5 @@
 import io
+import math
 
 import mss
 from PIL import Image, ImageFilter
@@ -15,7 +16,7 @@ def screenshot(radius: float, main_screen_only: bool) -> bytes:
 
     img_pil = Image.frombytes("RGB", img.size, img.rgb)
 
-    if radius > 0:
+    if math.isfinite(radius) and radius > 0:
         img_pil = img_pil.filter(ImageFilter.GaussianBlur(radius=radius))
 
     img_byte = io.BytesIO()
