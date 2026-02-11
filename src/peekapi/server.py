@@ -1,3 +1,4 @@
+import math
 from contextlib import asynccontextmanager
 from threading import Thread
 
@@ -53,6 +54,11 @@ def screen_route(
 ):
     """获取屏幕截图"""
     client_ip = request.client.host if request.client else "unknown"
+
+    # 拒绝 NaN / Inf 等非有限浮点数，防止绕过鉴权和模糊
+    if not math.isfinite(r):
+        logger.info(f"[{client_ip}] 截图请求被拒绝: 非法半径值 (r={r})")
+        raise HTTPException(status_code=401, detail="模糊半径必须为有限数值")
 
     if not config.basic.is_public:
         logger.info(f"[{client_ip}] 截图请求被拒绝: 私密模式")

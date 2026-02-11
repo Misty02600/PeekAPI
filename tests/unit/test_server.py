@@ -211,6 +211,37 @@ class TestServerRoutes:
 
         assert response.status_code == 401
 
+    def test_screen_nan_radius_rejected(self, app_client):
+        """NaN radius 返回 422，防止绕过鉴权和模糊"""
+        app_client["config"].basic.api_key = "secret123"
+        app_client["config"].screenshot.radius_threshold = 10
+
+        with patch("peekapi.server.screenshot", return_value=b"test") as mock_ss:
+            response = app_client["client"].get("/screen?r=nan")
+
+            assert response.status_code == 401
+            mock_ss.assert_not_called()
+
+    def test_screen_inf_radius_rejected(self, app_client):
+        """Inf radius 返回 422"""
+        app_client["config"].basic.api_key = "secret123"
+
+        with patch("peekapi.server.screenshot", return_value=b"test") as mock_ss:
+            response = app_client["client"].get("/screen?r=inf")
+
+            assert response.status_code == 401
+            mock_ss.assert_not_called()
+
+    def test_screen_negative_inf_radius_rejected(self, app_client):
+        """-Inf radius 返回 422"""
+        app_client["config"].basic.api_key = "secret123"
+
+        with patch("peekapi.server.screenshot", return_value=b"test") as mock_ss:
+            response = app_client["client"].get("/screen?r=-inf")
+
+            assert response.status_code == 401
+            mock_ss.assert_not_called()
+
     # ============ /record 端点测试 ============
 
     def test_record_public_mode_returns_audio(self, app_client):

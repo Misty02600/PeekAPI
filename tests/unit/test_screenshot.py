@@ -120,3 +120,21 @@ class TestScreenshot:
             # 获取传入 filter 的参数
             call_args = mock_filter.call_args[0][0]
             assert isinstance(call_args, ImageFilter.GaussianBlur)
+
+    def test_screenshot_nan_radius_no_blur(self, mock_mss):
+        """验证 radius=NaN 时不调用 filter（防御性检查）"""
+        from peekapi.screenshot import screenshot
+
+        with patch("PIL.Image.Image.filter") as mock_filter:
+            screenshot(radius=float("nan"), main_screen_only=True)
+
+            mock_filter.assert_not_called()
+
+    def test_screenshot_inf_radius_no_blur(self, mock_mss):
+        """验证 radius=Inf 时不调用 filter（防御性检查）"""
+        from peekapi.screenshot import screenshot
+
+        with patch("PIL.Image.Image.filter") as mock_filter:
+            screenshot(radius=float("inf"), main_screen_only=True)
+
+            mock_filter.assert_not_called()
