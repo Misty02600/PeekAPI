@@ -9,6 +9,7 @@ from pystray import MenuItem as Item
 from .config import config
 from .constants import ICON_PATH, LOG_DIR
 from .logging import logger
+from .power_events import setup_power_event_handler
 from .record import recorder
 
 
@@ -55,6 +56,12 @@ def exit_app(icon, _item):
     os._exit(0)
 
 
+def _on_tray_ready(icon):
+    """托盘图标就绪后的回调，用于注册电源事件处理器"""
+    icon.visible = True
+    setup_power_event_handler(icon)
+
+
 def start_system_tray():
     """启动托盘菜单"""
     icon_image = create_icon()
@@ -87,7 +94,4 @@ def start_system_tray():
         ),
     )
 
-    def run_tray():
-        icon.run()
-
-    run_tray()
+    icon.run(setup=_on_tray_ready)

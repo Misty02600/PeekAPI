@@ -9,6 +9,7 @@ from fastapi.responses import PlainTextResponse, Response
 from .config import config
 from .idle import get_idle_info
 from .logging import logger, setup_logging
+from .power_events import register_power_notification
 from .record import recorder
 from .screenshot import screenshot
 from .system_info import get_system_info
@@ -25,7 +26,10 @@ async def lifespan(app: FastAPI):
     # 启动录音
     recorder.start_recording()
 
-    # 启动系统托盘
+    # 注册电源事件回调（内核级，不依赖窗口消息循环）
+    register_power_notification(recorder)
+
+    # 启动系统托盘（同时注入 WM_POWERBROADCAST 作为备用机制）
     Thread(target=start_system_tray, daemon=True).start()
     logger.info("系统托盘线程已启动")
 
