@@ -2,6 +2,8 @@
 
 提供当前电脑屏幕截图和录音获取的本地 API，托盘一键切换公开/隐私模式和重启录音
 
+项目架构、ADR 和任务记录见 [Project Knowledge](docs/README.md)。
+
 ## **API 说明**
 
 | **端点**      | **方法**   | **功能**         | **参数**                                   | **成功返回**                                                                  | **失败返回**                                                                                                                        |
@@ -9,8 +11,18 @@
 | **`/screen`** | `GET`      | 获取屏幕截图     | - `r`（高斯模糊半径）<br>- `k`（API 密钥） | - `200 OK`，返回 `image/jpeg` 截图                                            | - `401 Unauthorized`：配置了 `api_key` 且低模糊度密钥错误<br>- `403 Forbidden`：私密模式<br>- `500 Internal Server Error`：截图失败 |
 | **`/record`** | `GET`      | 获取最近录音     | 无                                         | - `200 OK`，返回 `audio/wav` 录音文件                                         | - `403 Forbidden`：私密模式<br>- `500 Internal Server Error`：录音失败                                                              |
 | **`/idle`**   | `GET`      | 获取用户空闲时间 | 无                                         | - `200 OK`，返回 JSON：`{"idle_seconds": 123.456, "last_input_time": "..."}`  | - `403 Forbidden`：私密模式                                                                                                         |
+| **`/foreground`** | `GET`  | 获取前台应用名   | 无                                         | - `200 OK`，返回 JSON：`{"application": "Visual Studio Code"}` 或 `{"application": null}` | - `403 Forbidden`：私密模式                                                                                         |
 | **`/info`**   | `GET`      | 获取设备信息     | 无                                         | - `200 OK`，返回 JSON：`{"hostname": "PC", "cpu": "Intel...", "gpus": [...]}` | - `403 Forbidden`：私密模式                                                                                                         |
 | **`/check`**  | `GET/POST` | 检查是否运行     | 无                                         | - `200 OK`                                                                    | 无                                                                                                                                  |
+
+### 前台应用名
+
+`/foreground` 优先读取前台进程可执行文件版本资源中的 `FileDescription`，缺失时依次回退到
+`ProductName` 和可执行文件名。因此 Visual Studio Code 通常返回 `Visual Studio Code`，而不是
+`Code.exe`。服务不会读取窗口标题，也不会返回完整路径或 PID。
+
+无前台窗口、受保护进程或版本信息查询失败时，端点仍返回 200，并将 `application` 设为 `null`。
+首版只承诺传统 Windows 桌面程序，不保证 MSIX/UWP 应用名与任务管理器完全一致。
 
 ## **使用**
 
@@ -78,4 +90,3 @@ gain = 20      # 音量增益倍数
 | **`main_screen_only`** | 多显示器下是否只截取主显示器                       | `false`     |
 | **`duration`**         | 录音时间（秒）                                     | `20`        |
 | **`gain`**             | 音量增益倍数                                       | `20`        |
-
