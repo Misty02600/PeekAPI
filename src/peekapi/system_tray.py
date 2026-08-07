@@ -1,6 +1,5 @@
 import os
 import subprocess
-import time
 
 import pystray
 from PIL import Image, ImageDraw
@@ -39,9 +38,7 @@ def set_private(_icon, _item):
 
 def restart_recording(_icon, _item):
     recorder.stop_recording()
-    time.sleep(1)
     recorder.start_recording()
-    logger.info("录音线程已重新启动")
 
 
 def open_log_folder(_icon, _item):

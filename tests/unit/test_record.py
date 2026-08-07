@@ -1,12 +1,38 @@
 """音频录制模块测试"""
 
 import threading
-import time
 from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
 import soundfile as sf
+
+
+class _FakeWorker:
+    """用于确定性驱动录音线程生命周期的同步 fake。"""
+
+    def __init__(self, *, target, args=(), kwargs=None, on_start=None, **_):
+        self.target = target
+        self.args = args
+        self.kwargs = kwargs or {}
+        self.on_start = on_start
+        self.alive = False
+
+    def start(self):
+        if self.on_start is not None:
+            self.on_start()
+        self.alive = True
+
+    def is_alive(self):
+        return self.alive
+
+    def join(self, timeout=None):
+        del timeout
+
+    def finish(self):
+        self.alive = False
+        with patch("peekapi.record.threading.current_thread", return_value=self):
+            self.target(*self.args, **self.kwargs)
 
 
 class TestAudioRecorder:
@@ -127,6 +153,105 @@ class TestAudioRecorder:
                 # 清理
                 recorder.stop_recording()
 
+    def test_start_publishes_worker_while_holding_state_lock(self, recorder_class):
+        recorder = recorder_class()
+        buffer_lock = recorder._lock
+
+        def assert_state_lock_held():
+            acquired = recorder._state_lock.acquire(blocking=False)
+            if acquired:
+                recorder._state_lock.release()
+            assert acquired is False
+
+        class CheckingBufferLock:
+            def __enter__(self):
+                assert_state_lock_held()
+                buffer_lock.acquire()
+
+            def __exit__(self, *_args):
+                buffer_lock.release()
+
+        def make_worker(**kwargs):
+            assert_state_lock_held()
+            return _FakeWorker(on_start=assert_state_lock_held, **kwargs)
+
+        recorder._lock = CheckingBufferLock()
+        with patch("peekapi.record.threading.Thread", side_effect=make_worker):
+            recorder.start_recording()
+
+        assert recorder.record_thread is not None
+        assert recorder.record_thread.is_alive()
+
+    def test_start_retries_after_stopping_worker_finishes(self, recorder_class):
+        recorder = recorder_class()
+        workers = []
+
+        def make_worker(**kwargs):
+            worker = _FakeWorker(**kwargs)
+            workers.append(worker)
+            return worker
+
+        with patch("peekapi.record.threading.Thread", side_effect=make_worker):
+            recorder.start_recording()
+            old_worker = workers[0]
+            old_stop_event = old_worker.args[0]
+
+            recorder.stop_recording()
+            recorder.start_recording()
+
+            assert len(workers) == 1
+            assert recorder.record_thread is old_worker
+            assert recorder.is_recording is True
+            assert old_stop_event.is_set()
+
+            old_worker.finish()
+
+        assert len(workers) == 2
+        assert recorder.record_thread is workers[1]
+        assert workers[1].is_alive()
+        assert recorder.is_recording is True
+        assert workers[1].args[0] is not old_stop_event
+        assert not workers[1].args[0].is_set()
+
+    def test_stop_cancels_deferred_restart(self, recorder_class):
+        recorder = recorder_class()
+        workers = []
+
+        def make_worker(**kwargs):
+            worker = _FakeWorker(**kwargs)
+            workers.append(worker)
+            return worker
+
+        with patch("peekapi.record.threading.Thread", side_effect=make_worker):
+            recorder.start_recording()
+            old_worker = workers[0]
+
+            recorder.stop_recording()
+            recorder.start_recording()
+            recorder.stop_recording()
+            old_worker.finish()
+
+        assert len(workers) == 1
+        assert recorder.record_thread is None
+        assert recorder.is_recording is False
+
+    def test_stop_without_wait_does_not_join_worker(self, recorder_class):
+        recorder = recorder_class()
+
+        with patch(
+            "peekapi.record.threading.Thread",
+            side_effect=lambda **kwargs: _FakeWorker(**kwargs),
+        ):
+            recorder.start_recording()
+            worker = recorder.record_thread
+            assert worker is not None
+
+            with patch.object(worker, "join") as join:
+                recorder.stop_recording(wait=False)
+
+        join.assert_not_called()
+        assert recorder.is_recording is False
+
     def test_stop_recording_clears_flag(self, recorder_class, mock_soundcard):
         """验证停止录音清除标志"""
         with patch(
@@ -139,7 +264,6 @@ class TestAudioRecorder:
             ):
                 recorder = recorder_class()
                 recorder.start_recording()
-                time.sleep(0.1)  # 等待线程启动
 
                 recorder.stop_recording()
 
