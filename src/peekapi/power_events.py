@@ -89,20 +89,19 @@ def _on_power_event(context, event_type, setting):
                     logger.info("系统即将休眠/待机，正在停止录音设备...")
                     _suspended = True
                     try:
-                        recorder.stop_recording()
-                        logger.info("录音设备已安全停止")
+                        recorder.stop_recording(wait=False)
                     except Exception as e:
                         logger.error(f"停止录音设备时出错: {e}")
 
             elif event_type in (PBT_APMRESUMESUSPEND, PBT_APMRESUMEAUTOMATIC):
                 if _suspended:
                     logger.info("系统已唤醒，正在重新启动录音设备...")
-                    _suspended = False
                     try:
                         recorder.start_recording()
-                        logger.info("录音设备已重新启动")
                     except Exception as e:
                         logger.error(f"重新启动录音设备时出错: {e}")
+                    else:
+                        _suspended = False
     except Exception as e:
         # 回调中的异常不能传播到 Windows 内核
         try:
