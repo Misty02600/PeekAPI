@@ -354,6 +354,67 @@ class TestServerRoutes:
         # 验证四舍五入到 3 位小数
         assert data["idle_seconds"] == 123.457
 
+    # ============ /foreground 端点测试 ============
+
+    def test_foreground_public_mode_returns_application(self, app_client):
+        with patch(
+            "peekapi.server.get_foreground_application",
+            return_value="Visual Studio Code",
+        ):
+            response = app_client["client"].get("/foreground")
+
+        assert response.status_code == 200
+        assert response.json() == {"application": "Visual Studio Code"}
+
+    def test_foreground_unavailable_returns_null(self, app_client):
+        with patch(
+            "peekapi.server.get_foreground_application",
+            return_value=None,
+        ):
+            response = app_client["client"].get("/foreground")
+
+        assert response.status_code == 200
+        assert response.json() == {"application": None}
+
+    def test_foreground_openapi_declares_required_application(self, app_client):
+        schema = app_client["client"].get("/openapi.json").json()
+        response_schema = schema["paths"]["/foreground"]["get"]["responses"]["200"][
+            "content"
+        ]["application/json"]["schema"]
+        foreground_schema = schema["components"]["schemas"]["ForegroundResponse"]
+
+        assert response_schema == {"$ref": "#/components/schemas/ForegroundResponse"}
+        assert foreground_schema["required"] == ["application"]
+        assert foreground_schema["properties"]["application"]["anyOf"] == [
+            {"type": "string"},
+            {"type": "null"},
+        ]
+
+    def test_foreground_private_mode_returns_403_without_sampling(
+        self,
+        app_client,
+    ):
+        app_client["config"].basic.is_public = False
+
+        with patch("peekapi.server.get_foreground_application") as get_application:
+            response = app_client["client"].get("/foreground")
+
+        assert response.status_code == 403
+        get_application.assert_not_called()
+
+    def test_screen_does_not_sample_foreground_application(self, app_client):
+        mock_img_data = b"\xff\xd8\xff" + b"\x00" * 100
+
+        with (
+            patch("peekapi.server.screenshot", return_value=mock_img_data),
+            patch("peekapi.server.get_foreground_application") as get_application,
+        ):
+            response = app_client["client"].get("/screen")
+
+        assert response.status_code == 200
+        assert "x-peek-foreground-application" not in response.headers
+        get_application.assert_not_called()
+
     # ============ /favicon.ico 端点测试 ============
 
     def test_favicon_not_implemented(self, app_client):

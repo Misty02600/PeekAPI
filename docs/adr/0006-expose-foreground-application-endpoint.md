@@ -74,10 +74,10 @@
 
 ## 落实与确认
 
-- 实施情况：已落实，等待改动验收与 Git 提交
+- 实施情况：已落实并通过单元测试与 Windows 可执行文件版本资源验证
 - 代码或测试：[`foreground.py`](../../src/peekapi/foreground.py)、
   [`test_foreground.py`](../../tests/unit/test_foreground.py)、
-  [PLAN-0020](../plans/todo/0020-add-foreground-application-endpoint.md)
+  [PLAN-0020](../plans/done/0020-add-foreground-application-endpoint.md)
 
 ## 相关文档
 

@@ -17,7 +17,6 @@
 | Plan | 目标 |
 |---|---|
 | [PLAN-0017](todo/0017-fix-recorder-lifecycle-races.md) | 修复录音启停与电源恢复竞态 |
-| [PLAN-0020](todo/0020-add-foreground-application-endpoint.md) | 新增前台应用查询端点 |
 | [PLAN-0021](todo/0021-unify-version-metadata.md) | 统一项目、HTTP 与 Windows 产物的版本元数据 |
 
 ## 已完成
@@ -38,6 +37,7 @@
 | [PLAN-0013](done/0013-add-idle-endpoint.md) | 添加空闲时间端点 |
 | [PLAN-0014](done/0014-fix-idle-tick-overflow.md) | 修复 tick 回绕 |
 | [PLAN-0015](done/0015-add-system-info-endpoint.md) | 添加设备信息端点 |
+| [PLAN-0020](done/0020-add-foreground-application-endpoint.md) | 新增前台应用查询端点 |
 
 ## 生命周期
 
