@@ -11,6 +11,7 @@
 | [PLAN-0016](todo/0016-validate-sleep-crash.md) | 核验 Windows 长时间休眠恢复 |
 | [PLAN-0018](todo/0018-report-recorder-health.md) | 让录音 API 表达设备健康状态 |
 | [PLAN-0019](todo/0019-upgrade-release-action.md) | 升级 GitHub Release action |
+| [PLAN-0022](todo/0022-manage-windows-logon-autostart.md) | 由 PeekAPI 管理 Windows 用户登录自启 |
 
 ## 进行中
 

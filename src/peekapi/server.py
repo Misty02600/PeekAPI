@@ -7,6 +7,7 @@ import uvicorn
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import PlainTextResponse, Response
 
+from . import __version__
 from .config import config
 from .foreground import get_foreground_application
 from .idle import get_idle_info
@@ -49,7 +50,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="PeekAPI",
     description="屏幕截图和音频录制 API 服务",
-    version="0.1.0",
+    version=__version__,
     lifespan=lifespan,
 )
 
