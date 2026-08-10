@@ -1,12 +1,14 @@
 import math
 from contextlib import asynccontextmanager
 from threading import Thread
+from typing_extensions import TypedDict
 
 import uvicorn
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.responses import PlainTextResponse, Response
 
 from .config import config
+from .foreground import get_foreground_application
 from .idle import get_idle_info
 from .logging import logger, setup_logging
 from .power_events import register_power_notification
@@ -14,6 +16,10 @@ from .record import recorder
 from .screenshot import screenshot
 from .system_info import get_system_info
 from .system_tray import start_system_tray
+
+
+class ForegroundResponse(TypedDict):
+    application: str | None
 
 
 @asynccontextmanager
@@ -121,6 +127,20 @@ def idle_route(request: Request):
         "idle_seconds": round(idle_seconds, 3),
         "last_input_time": last_input_time.isoformat(),
     }
+
+
+@app.get("/foreground")
+def foreground_route(request: Request) -> ForegroundResponse:
+    """获取前台应用显示名"""
+    client_ip = request.client.host if request.client else "unknown"
+
+    if not config.basic.is_public:
+        logger.info(f"[{client_ip}] 前台应用请求被拒绝: 私密模式")
+        raise HTTPException(status_code=403, detail="瑟瑟中")
+
+    application = get_foreground_application()
+    logger.info(f"[{client_ip}] 前台应用请求成功 (available={application is not None})")
+    return {"application": application}
 
 
 @app.get("/info")
