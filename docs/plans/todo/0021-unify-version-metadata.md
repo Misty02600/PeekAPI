@@ -6,7 +6,7 @@
 
 ## 最后更新
 
-2026-08-02
+2026-08-07
 
 ## 目标和成功标准
 
@@ -48,10 +48,14 @@ PyInstaller Windows 文件属性、标签校验和 `uv.lock` 保持一致，删�
 
 ## 还需要决定什么
 
-- 在未安装发行版 metadata 的直接源码导入场景中，是明确失败还是提供开发态 fallback。
 - `peekapi.spec` 是否必须复制完整发行版 metadata，还是仅动态版本值已经足够。
 - 预发布、本地版本和超过四段 release tuple 如何映射到 Windows 四段数字版本。
 - action/release 标签策略是否与本计划一起调整；当前应避免与 PLAN-0019 混合范围。
+
+## 已确认事项
+
+- 不支持仅把 `src` 加入 Python 搜索路径、却未安装发行版 metadata 的 source-only 导入；开发与构建继续
+  通过 `uv sync` / `uv run`，metadata 缺失时保留显式失败，不增加 fallback。
 
 ## 阻碍
 
@@ -67,7 +71,7 @@ PyInstaller Windows 文件属性、标签校验和 `uv.lock` 保持一致，删�
 
 ## 审批与提交
 
-- 用户确认：未确认
+- 用户确认：已确认 source-only 导入边界；其余方案仍待确认
 - Git 提交：未提交
 
 ## 进展记录

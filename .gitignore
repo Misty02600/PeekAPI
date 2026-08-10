@@ -226,9 +226,5 @@ __marimo__/
 # Built Visual Studio Code Extensions
 *.vsix
 
-# Local
+# Logs
 logs/
-.sandbox/
-
-# ai
-.github/instructions/

@@ -21,7 +21,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "basedpyright>=1.16.0",
-    "commitizen>=4.1.0",
+    "commitizen>=4.3.0",
     "git-cliff>=2.11.0,<3.0.0",
     "prek>=0.2.0",
     "ruff>=0.14.13,<1.0.0",
@@ -47,9 +47,8 @@ build-backend = "uv_build"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "0.3.1"
+version_provider = "uv"
 tag_format = "v$version"
-version_files = ["pyproject.toml:^version"]
 major_version_zero = true
 
 [tool.coverage.run]

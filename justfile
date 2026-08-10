@@ -56,13 +56,9 @@ check:
 
 # ===== 版本管理 =====
 
-# 版本发布（更新版本号、更新 lock 文件、自动修正标签）
+# 版本发布（Commitizen 通过 uv provider 同步 pyproject.toml 和 uv.lock）
 bump:
     uv run cz bump
-    uv lock
-    git add uv.lock
-    git commit --amend --no-edit --no-verify
-    $version = (uv run cz version --project).Trim(); git tag -f "v$version"
     git push --tags
 
 # 生成 changelog

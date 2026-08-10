@@ -799,7 +799,7 @@ requires-dist = [
 [package.metadata.requires-dev]
 dev = [
     { name = "basedpyright", specifier = ">=1.16.0" },
-    { name = "commitizen", specifier = ">=4.1.0" },
+    { name = "commitizen", specifier = ">=4.3.0" },
     { name = "git-cliff", specifier = ">=2.11.0,<3.0.0" },
     { name = "httpx", specifier = ">=0.28.0" },
     { name = "prek", specifier = ">=0.2.0" },
