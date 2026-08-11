@@ -12,6 +12,7 @@ ADR 只记录会长期影响架构、依赖、部署或跨模块协作的决定�
 | [0004](0004-use-soundfile-for-wav.md) | 已采纳 | 2026-01-26 | 使用 soundfile 生成 WAV |
 | [0005](0005-handle-suspend-resume-events.md) | 已采纳 | 2026-03-12 | 使用双重 Windows 电源通知机制协调录音 |
 | [0006](0006-expose-foreground-application-endpoint.md) | 已采纳 | 2026-08-02 | 用独立端点查询前台应用显示名 |
+| [0007](0007-use-hkcu-run-for-logon-autostart.md) | 已采纳 | 2026-08-11 | 使用 HKCU Run 管理 Windows 用户登录自启 |
 
 ## 讨论中
 
