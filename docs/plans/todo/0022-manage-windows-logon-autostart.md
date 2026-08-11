@@ -2,7 +2,7 @@
 
 | 状态 | 最后更新 |
 |---|---|
-| 讨论中 | 2026-08-10 |
+| 进行中 | 2026-08-11 |
 
 ## 背景
 
@@ -60,11 +60,13 @@ PowerShell `ScheduledTasks` 对象命令以及
   当前打包 exe 绝对路径。稳定运行路径不创建计划任务、不调用 Task Scheduler API，也不生成任务 XML。
 - 启用操作幂等：重复启用会把目标更新为当前 `peekapi.exe`，不会创建多个定义；禁用只删除明确属于
   PeekAPI 的注册，不触碰其他应用任务。
-- 发现现有 `\PeekAPI` 计划任务时先读取动作目标。目标是当前或可识别的旧 PeekAPI 可执行文件时才迁移；
-  一次性迁移通过 `schtasks.exe /Query /TN \PeekAPI /XML` 读取定义，用标准库 `xml.etree.ElementTree` 核对
-  `Exec/Command`，确认归属后才用 `schtasks.exe /Delete /TN \PeekAPI /F` 注销，再写入 HKCU Run。XML 只用作
-  读取旧任务，不用于创建新任务。目标不匹配、无权注销或无法确认归属时，不写入 HKCU Run，并给出日志，
-  避免重复启动或仅凭同名任务删除外部状态。
+- 升级或启动新版不自动修改现有 `\PeekAPI` 计划任务；用户首次在托盘启用登录自启时才读取动作目标。
+  目标是当前或可识别的旧 PeekAPI 可执行文件时才迁移；一次性迁移通过
+  `schtasks.exe /Query /TN \PeekAPI /XML` 读取定义，用标准库 `xml.etree.ElementTree` 核对 `Exec/Command`。
+  确认归属后先写入并回读验证 HKCU Run，再用 `schtasks.exe /Delete /TN \PeekAPI /F` 注销旧任务；注销失败
+  且旧任务需要管理员权限时，通过 PowerShell `Start-Process -Verb RunAs` 发起一次 UAC 删除；用户取消或
+  注销仍失败时恢复原注册表值并保留旧任务。XML 只用于读取旧任务，不用于创建新任务。目标不匹配或无法
+  确认归属时，不修改 HKCU Run，并给出日志，避免重复启动或仅凭同名任务删除外部状态。
 - 无论选用哪种注册后端，都必须允许电池供电，并且不得因 AC/DC 切换停止正在运行的 PeekAPI。
 - 注册失败只影响自启设置，必须记录可操作的错误并保持当前 HTTP 服务和录音线程存活。
 - 本计划只建立登录自启和现有错误任务迁移，不承诺异常退出自动重启，不引入 Windows 服务或外部
@@ -79,6 +81,18 @@ PowerShell `ScheduledTasks` 对象命令以及
 | 3 | 覆盖后端、路径、迁移和失败语义 | 新增 `tests/unit/test_autostart.py`，必要时补充托盘测试 | mock 所有注册表、PowerShell 或进程调用；测试不修改开发机真实自启项 | 自动化证明控制流与安全边界 |
 | 4 | 在打包产物上验证真实 Windows 注册 | `peekapi.spec` 产物与 Windows Task Scheduler/注册表 | 使用固定构建身份；验证登录、电池切换、重复启用和禁用 | 发布形态的自启行为可复现 |
 | 5 | 同步稳定部署和生命周期说明 | `docs/architecture/overview.md`、`docs/architecture/flows/application-lifecycle.md`，必要时新增 ADR | 只在方案确认和实测后写成稳定事实 | 文档不把计划行为误写成已实现行为 |
+
+## 实施进度
+
+- 当前工作：等待重新登录与 AC/DC 切换实机验收。
+- 已确认：迁移只由用户启用操作触发；迁移采用“写入并验证新注册项 → 注销旧任务 → 失败时恢复原值”的
+  顺序；旧任务拒绝普通用户删除时才请求一次 UAC，取消授权仍按相同规则回滚。
+- 已完成：自启后端、托盘开关与目标测试；全量测试、ruff、格式、basedpyright 和 onefolder
+  冒烟通过；正式产物已更新并恢复服务。无提权迁移按预期回滚，UAC 路径随后成功删除旧任务
+  并写入 HKCU Run；真实禁用与重新启用期间 `/check` 均返回 200，最终保持启用。
+- 下一步：重新登录确认 Windows 从 HKCU Run 启动当前 exe；完成一次 AC→电池切换，确认原 PID 和
+  `/check` 持续存活。
+- 阻塞：暂无。
 
 ## 完成标准与验证
 
@@ -97,10 +111,13 @@ PowerShell `ScheduledTasks` 对象命令以及
 
 - 2026-08-10 · D-001：采用当前用户 HKCU Run 作为唯一稳定自启后端，不新增 COM 依赖、不用 XML 创建
   计划任务；现有 `\PeekAPI` 计划任务只作为一次性迁移来源安全注销。
+- 2026-08-11 · D-002：升级或启动不自动迁移；由用户启用操作触发。先写入并验证 HKCU Run，再注销旧
+  任务；注销失败时恢复注册表原值，避免迁移失败同时丢失两个自启入口。
 
 ## 相关文档
 
 - [PLAN-0016：核验休眠后进程终止问题](0016-validate-sleep-crash.md)
 - [PLAN-0017：修复录音启停与电源恢复竞态](0017-fix-recorder-lifecycle-races.md)
 - [ADR-0005：使用双重 Windows 电源通知机制](../../adr/0005-handle-suspend-resume-events.md)
+- [ADR-0007：使用 HKCU Run 管理 Windows 用户登录自启](../../adr/0007-use-hkcu-run-for-logon-autostart.md)
 - [应用启动、关闭与电源事件](../../architecture/flows/application-lifecycle.md)

@@ -5,6 +5,13 @@ import pystray
 from PIL import Image, ImageDraw
 from pystray import MenuItem as Item
 
+from .autostart import (
+    AutostartError,
+    disable_autostart,
+    enable_autostart,
+    is_autostart_enabled,
+    is_packaged_app,
+)
 from .config import config
 from .constants import ICON_PATH, LOG_DIR
 from .logging import logger
@@ -44,6 +51,31 @@ def restart_recording(_icon, _item):
 def open_log_folder(_icon, _item):
     """打开日志文件夹"""
     subprocess.run(["explorer", str(LOG_DIR)])
+
+
+def _is_autostart_checked(_item):
+    try:
+        return is_autostart_enabled()
+    except AutostartError as error:
+        logger.warning(f"无法查询登录自启状态: {error}")
+        return False
+
+
+def toggle_autostart(icon, _item):
+    try:
+        if is_autostart_enabled():
+            disable_autostart()
+            logger.info("已禁用登录时自动启动")
+        else:
+            migrated = enable_autostart()
+            if migrated:
+                logger.info("已迁移旧计划任务并启用登录时自动启动")
+            else:
+                logger.info("已启用登录时自动启动")
+    except AutostartError as error:
+        logger.warning(f"切换登录自启失败: {error}")
+    finally:
+        icon.update_menu()
 
 
 def exit_app(icon, _item):
@@ -86,6 +118,12 @@ def start_system_tray():
                 ),
             ),
             Item("重启录音", restart_recording),
+            Item(
+                "登录时自动启动",
+                toggle_autostart,
+                checked=_is_autostart_checked,
+                enabled=is_packaged_app(),
+            ),
             Item("打开日志", open_log_folder),
             Item("退出", exit_app),
         ),
