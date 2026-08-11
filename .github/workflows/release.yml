@@ -60,7 +60,7 @@ jobs:
           path: 'peekapi'
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           name: PeekAPI ${{ steps.version.outputs.TAG_NAME }}
           body: ${{ steps.changelog.outputs.content }}
