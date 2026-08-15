@@ -13,7 +13,7 @@ dependencies = [
     "pystray>=0.19.5,<0.20.0",
     "soundcard>=0.4.5,<0.5.0",
     "soundfile>=0.13.0",
-    "numpy>=2.0.0,<2.3.0",
+    "numpy>=2.5.2,<2.6.0",
     "msgspec>=0.20.0",
     "loguru>=0.7.3",
 ]
